@@ -50,8 +50,42 @@
 <div class="app-layout">
 
     <!-- ─── Sidebar ─── -->
-    <aside class="sidebar" id="sidebar">
-        <!-- Upload -->
+    
+<aside class="sidebar" id="sidebar" style="display: flex; flex-direction: column;">
+    
+        <div class="sidebar-section-title">Menu Navigasi</div>
+        <div class="nav-vertical">
+            <button class="nav-tab active" data-tab="analyzer" onclick="switchTab('analyzer')">
+                <i class="ti ti-calculator"></i> Analyzer
+            </button>
+            <button class="nav-tab" data-tab="iklan" onclick="switchTab('iklan')">
+                <i class="ti ti-ad"></i> Iklan Toko
+            </button>
+            <button class="nav-tab" data-tab="data" onclick="switchTab('data')">
+                <i class="ti ti-table"></i> Data Preview
+            </button>
+            <button class="nav-tab" data-tab="keuangan" onclick="switchTab('keuangan')">
+                <i class="ti ti-wallet"></i> Keuangan
+            </button>
+        </div>
+    
+    <div style="flex: 1;"></div>
+    <div class="sidebar-footer" style="padding-top: var(--space-4); border-top: 1px solid var(--border-light); margin-top: auto; font-size: 12px; color: var(--text-tertiary);">
+        ProfitAnalyzer v2.0 <br> 100% Offline
+    </div>
+</aside>
+
+
+    <!-- ─── Main Content ─── -->
+    <div class="main-content" id="mainContent">
+
+        
+<!-- TAB: Analyzer -->
+<div id="tabAnalyzer">
+    <div class="analyzer-grid" style="display: grid; grid-template-columns: 320px 1fr; gap: var(--space-6); align-items: start;">
+        <!-- Panel Kiri: Config -->
+        <div class="analyzer-left-panel" style="background: var(--bg-primary); border-radius: var(--radius-lg); border: 1px solid var(--border-light); padding: var(--space-5);">
+            <!-- Upload -->
         <div>
             <div class="sidebar-section-title">Import Data</div>
             <div class="upload-zone" id="uploadZone">
@@ -141,17 +175,10 @@
                 </div>
             </div>
         </div>
-
-        <div class="sidebar-footer">
-            ProfitAnalyzer v2.0 · 100% Offline
         </div>
-    </aside>
+        <!-- Panel Kanan: Results -->
+        <div class="analyzer-right-panel" style="min-width: 0;">
 
-    <!-- ─── Main Content ─── -->
-    <div class="main-content" id="mainContent">
-
-        <!-- TAB: Analyzer -->
-        <div id="tabAnalyzer">
             <!-- Empty State -->
             <div class="empty-state" id="emptyState">
                 <div class="empty-state-icon">
@@ -251,6 +278,10 @@
                 </div>
             </div>
         </div>
+
+                </div>
+    </div>
+</div>
 
         <!-- TAB: Data Preview -->
         <div id="tabData" style="display:none;">
@@ -493,24 +524,7 @@
         </div>
     </div>
 
-    <!-- ─── RIGHT SIDEBAR (MENU) ─── -->
-    <aside class="sidebar-right">
-        <div class="sidebar-section-title">Menu Utama</div>
-        <div class="nav-vertical">
-            <button class="nav-tab active" data-tab="analyzer" onclick="switchTab('analyzer')">
-                <i class="ti ti-calculator"></i> Analyzer
-            </button>
-            <button class="nav-tab" data-tab="iklan" onclick="switchTab('iklan')">
-                <i class="ti ti-ad"></i> Iklan Toko
-            </button>
-            <button class="nav-tab" data-tab="data" onclick="switchTab('data')">
-                <i class="ti ti-table"></i> Data Preview
-            </button>
-            <button class="nav-tab" data-tab="keuangan" onclick="switchTab('keuangan')">
-                <i class="ti ti-wallet"></i> Keuangan
-            </button>
-        </div>
-    </aside>
+    
 </div>
 <!-- ═══════════════════════════════════════════════════
      TOAST CONTAINER
