@@ -102,6 +102,7 @@
 
             /* Sidebar */
             --sidebar-width: 320px;
+            --sidebar-right-width: 220px;
         }
 
         /* ═══════════════════════════════════════════════════
@@ -287,6 +288,37 @@
             display: flex;
             flex-direction: column;
             gap: var(--space-6);
+        }
+
+        /* Right Sidebar */
+        .sidebar-right {
+            width: var(--sidebar-right-width);
+            background: var(--bg-secondary);
+            border-left: 1px solid var(--border-light);
+            padding: var(--space-5);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .nav-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .nav-vertical .nav-tab {
+            width: 100%;
+            justify-content: flex-start;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+        }
+        
+        .nav-vertical .nav-tab.active {
+            background: var(--brand-light);
+            color: var(--brand-dark);
         }
 
         /* ═══════════════════════════════════════════════════
@@ -1397,18 +1429,9 @@
         <span class="nav-title">Profit<span>Analyzer</span></span>
     </div>
 
-    <div class="nav-center">
-        <button class="nav-tab active" data-tab="analyzer" onclick="switchTab('analyzer')">
-            <i class="ti ti-calculator"></i> Analyzer
-        </button>
-        <button class="nav-tab" data-tab="iklan" onclick="switchTab('iklan')">
-            <i class="ti ti-ad"></i> Iklan Toko
-        </button>
-        <button class="nav-tab" data-tab="data" onclick="switchTab('data')">
-            <i class="ti ti-table"></i> Data Preview
-        </button>
+    <div class="nav-center" style="display:none;">
+        <!-- Moved to right sidebar -->
     </div>
-
     <div class="nav-actions">
         <button class="btn-sm" onclick="openExportModal()" id="exportBtn" style="display:none;">
             <i class="ti ti-download"></i> Export
@@ -1697,8 +1720,23 @@
         </div>
 
     </div>
-</div>
 
+    <!-- ─── RIGHT SIDEBAR (MENU) ─── -->
+    <aside class="sidebar-right">
+        <div class="sidebar-section-title">Menu Utama</div>
+        <div class="nav-vertical">
+            <button class="nav-tab active" data-tab="analyzer" onclick="switchTab('analyzer')">
+                <i class="ti ti-calculator"></i> Analyzer
+            </button>
+            <button class="nav-tab" data-tab="iklan" onclick="switchTab('iklan')">
+                <i class="ti ti-ad"></i> Iklan Toko
+            </button>
+            <button class="nav-tab" data-tab="data" onclick="switchTab('data')">
+                <i class="ti ti-table"></i> Data Preview
+            </button>
+        </div>
+    </aside>
+</div>
 <!-- ═══════════════════════════════════════════════════
      TOAST CONTAINER
      ═══════════════════════════════════════════════════ -->
