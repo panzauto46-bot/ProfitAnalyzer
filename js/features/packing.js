@@ -191,8 +191,26 @@ window.currentOrderTab = 'Semua';
 function switchOrderTab(tabName) {
     window.currentOrderTab = tabName;
     
-    // Update Title
-    document.getElementById('orderListTitle').innerHTML = '<i class="ti ti-list"></i> Daftar Pesanan: ' + tabName;
+    // Handle Empty State UI specifically for Dashboard
+    const uploadBtn = document.querySelector('#packingEmptyState button');
+    const emptyTitle = document.querySelector('#packingEmptyState h3');
+    const emptyDesc = document.querySelector('#packingEmptyState p');
+    
+    if (tabName === 'Dashboard') {
+        if (uploadBtn) uploadBtn.style.display = 'none';
+        if (emptyTitle) emptyTitle.innerText = 'Dashboard Kosong';
+        if (emptyDesc) emptyDesc.innerText = 'Silakan ke tab "Semua" atau "Perlu Dikirim" untuk mengimpor file pesanan terlebih dahulu.';
+    } else {
+        if (uploadBtn) uploadBtn.style.display = 'flex';
+        if (emptyTitle) emptyTitle.innerText = 'Sistem Manajemen Pesanan Kosong';
+        if (emptyDesc) emptyDesc.innerText = 'Upload file "Pesanan Perlu Dikirim", "Dikirim", "Selesai", atau "Semua" untuk melacak status pesanan.';
+    }
+
+    // Update Title if Results Area is visible
+    const titleEl = document.getElementById('orderListTitle');
+    if (titleEl) {
+        titleEl.innerHTML = '<i class="ti ti-list"></i> Daftar Pesanan: ' + tabName;
+    }
     
     // Reset all tabs UI
     const tabs = ['Dashboard', 'Semua', 'Perlu Dikirim', 'Dikirim', 'Selesai'];
@@ -213,10 +231,4 @@ function switchOrderTab(tabName) {
         activeEl.style.borderBottom = '3px solid var(--brand-primary)';
         activeEl.classList.add('active');
     }
-    
-    // For now, if we already have data loaded, just re-render the table with filtering (to be implemented)
-    // filterPackingTable();
 }
-
-
-
