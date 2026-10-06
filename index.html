@@ -1719,6 +1719,50 @@
             </div>
         </div>
 
+        <!-- TAB: Keuangan -->
+        <div id="tabKeuangan" style="display:none;">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-header-title"><i class="ti ti-wallet"></i> Keuangan (Penarikan & Transaksi)</span>
+                </div>
+                <div class="card-body" style="min-height: 400px;">
+                    <div class="tabs" style="display: flex; gap: var(--space-2); margin-bottom: var(--space-5); border-bottom: 1px solid var(--border-light); padding-bottom: var(--space-3);">
+                        <button class="btn btn-outline" style="border-radius: var(--radius-full); background: var(--brand-light); color: var(--brand-dark); border-color: var(--brand-secondary);" id="btnKeuanganPenarikan" onclick="switchKeuanganTab('penarikan')">Penarikan Dana</button>
+                        <button class="btn btn-outline" style="border-radius: var(--radius-full);" id="btnKeuanganPending" onclick="switchKeuanganTab('pending')">Transaksi Pending</button>
+                        <button class="btn btn-outline" style="border-radius: var(--radius-full);" id="btnKeuanganSelesai" onclick="switchKeuanganTab('selesai')">Transaksi Selesai</button>
+                    </div>
+
+                    <div class="upload-zone" id="uploadZoneKeuangan" style="margin-bottom: var(--space-5);">
+                        <input type="file" id="fileInputKeuangan" accept=".csv,.xlsx,.xls">
+                        <div class="upload-icon-wrap">
+                            <i class="ti ti-file-upload"></i>
+                        </div>
+                        <div class="upload-name" id="fileNameKeuangan">Drop file Penarikan Dana (.xlsx) di sini</div>
+                        <div class="upload-hint">Sistem akan otomatis mendeteksi kolom nominal dan menampilkannya</div>
+                    </div>
+
+                    <div id="keuanganResults" style="display:none;">
+                        <div class="stats-grid" style="margin-bottom: var(--space-6);">
+                            <div class="stat-card">
+                                <div class="stat-title" id="keuanganTotalTitle">Total Nominal</div>
+                                <div class="stat-value" id="keuanganTotalValue" style="color: var(--brand-primary);">Rp0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-title">Jumlah Baris Data</div>
+                                <div class="stat-value" id="keuanganRowCount">0</div>
+                            </div>
+                        </div>
+                        
+                        <div class="table-wrap" style="max-height: 500px; overflow-y: auto;">
+                            <table class="data-table">
+                                <thead id="keuanganTableHead"></thead>
+                                <tbody id="keuanganTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- ─── RIGHT SIDEBAR (MENU) ─── -->
@@ -1733,6 +1777,9 @@
             </button>
             <button class="nav-tab" data-tab="data" onclick="switchTab('data')">
                 <i class="ti ti-table"></i> Data Preview
+            </button>
+            <button class="nav-tab" data-tab="keuangan" onclick="switchTab('keuangan')">
+                <i class="ti ti-wallet"></i> Keuangan
             </button>
         </div>
     </aside>
@@ -1894,6 +1941,7 @@ function switchTab(tab) {
     document.getElementById('tabAnalyzer').style.display = tab === 'analyzer' ? 'block' : 'none';
     document.getElementById('tabData').style.display = tab === 'data' ? 'block' : 'none';
     document.getElementById('tabIklan').style.display = tab === 'iklan' ? 'block' : 'none';
+    document.getElementById('tabKeuangan').style.display = tab === 'keuangan' ? 'block' : 'none';
 }
 
 // ═══════════════════════════════════════════════════
@@ -2681,6 +2729,178 @@ document.addEventListener('keydown', (e) => {
         e.preventDefault();
         calculate();
     }
+});
+
+// ═══════════════════════════════════════════════════
+// KEUANGAN LOGIC
+// ═══════════════════════════════════════════════════
+let currentKeuanganTab = 'penarikan';
+let keuanganData = { penarikan: null, pending: null, selesai: null };
+
+function switchKeuanganTab(tab) {
+    currentKeuanganTab = tab;
+    
+    // Update buttons
+    ['penarikan', 'pending', 'selesai'].forEach(t => {
+        const btn = document.getElementById('btnKeuangan' + t.charAt(0).toUpperCase() + t.slice(1));
+        if (t === tab) {
+            btn.style.background = 'var(--brand-light)';
+            btn.style.color = 'var(--brand-dark)';
+            btn.style.borderColor = 'var(--brand-secondary)';
+        } else {
+            btn.style.background = 'transparent';
+            btn.style.color = 'var(--text-secondary)';
+            btn.style.borderColor = 'var(--border-light)';
+        }
+    });
+
+    // Update UI text based on tab
+    let title = tab === 'penarikan' ? 'Penarikan Dana' : tab === 'pending' ? 'Transaksi Pending' : 'Transaksi Selesai';
+    document.getElementById('fileNameKeuangan').innerText = `Drop file ${title} (.xlsx) di sini`;
+    
+    // Render data if exists
+    if (keuanganData[tab]) {
+        renderKeuanganData(keuanganData[tab]);
+    } else {
+        document.getElementById('keuanganResults').style.display = 'none';
+        document.getElementById('fileInputKeuangan').value = ""; // clear input
+    }
+}
+
+document.getElementById('fileInputKeuangan').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+        try {
+            const data = evt.target.result;
+            const workbook = XLSX.read(data, { type: 'binary' });
+            const firstSheet = workbook.SheetNames[0];
+            const rows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet], { defval: "" });
+            
+            keuanganData[currentKeuanganTab] = rows;
+            renderKeuanganData(rows);
+            showToast('Data berhasil dimuat', 'success');
+        } catch (err) {
+            console.error(err);
+            showToast('Gagal memuat file Excel', 'error');
+        }
+    };
+    reader.readAsBinaryString(file);
+});
+
+function renderKeuanganData(rows) {
+    if (!rows || rows.length === 0) {
+        document.getElementById('keuanganResults').style.display = 'none';
+        return;
+    }
+    
+    document.getElementById('keuanganResults').style.display = 'block';
+    document.getElementById('keuanganRowCount').innerText = rows.length;
+    
+    // Detect money column intelligently
+    let moneyCol = null;
+    const headers = Object.keys(rows[0]);
+    
+    for (let h of headers) {
+        let hl = h.toLowerCase();
+        if (hl.includes('jumlah') || hl.includes('nominal') || hl.includes('total') || hl.includes('pelepasan') || hl.includes('dana') || hl.includes('amount') || hl.includes('pembayaran') || hl.includes('penghasilan')) {
+            // verify if values are mostly numeric
+            let isNumeric = false;
+            for(let i=0; i<Math.min(5, rows.length); i++) {
+                if (typeof rows[i][h] === 'number' || !isNaN(parseFloat(String(rows[i][h]).replace(/[^0-9.-]/g, '')))) {
+                    isNumeric = true;
+                    break;
+                }
+            }
+            if (isNumeric) {
+                moneyCol = h;
+                break;
+            }
+        }
+    }
+    
+    // Fallback if no specific name matches: find the first numeric column
+    if (!moneyCol) {
+        for (let h of headers) {
+            for(let i=0; i<Math.min(5, rows.length); i++) {
+                if (typeof rows[i][h] === 'number') {
+                    moneyCol = h;
+                    break;
+                }
+            }
+            if (moneyCol) break;
+        }
+    }
+    
+    let total = 0;
+    if (moneyCol) {
+        rows.forEach(r => {
+            let val = r[moneyCol];
+            let num = 0;
+            if (typeof val === 'number') num = val;
+            else if (typeof val === 'string') {
+                num = parseFloat(val.replace(/[^0-9.-]/g, ''));
+            }
+            if (!isNaN(num)) total += num;
+        });
+        document.getElementById('keuanganTotalTitle').innerText = 'Total ' + moneyCol;
+        document.getElementById('keuanganTotalValue').innerText = rp(total);
+    } else {
+        document.getElementById('keuanganTotalTitle').innerText = 'Total Nominal';
+        document.getElementById('keuanganTotalValue').innerText = '-';
+    }
+    
+    // Render table
+    const thead = document.getElementById('keuanganTableHead');
+    const tbody = document.getElementById('keuanganTableBody');
+    
+    let headHTML = '<tr>';
+    headers.forEach(h => { headHTML += `<th style="white-space:nowrap;">${h}</th>`; });
+    headHTML += '</tr>';
+    thead.innerHTML = headHTML;
+    
+    let bodyHTML = '';
+    // show up to 100 rows to prevent lag
+    const maxRows = Math.min(rows.length, 100);
+    for (let i = 0; i < maxRows; i++) {
+        bodyHTML += '<tr>';
+        headers.forEach(h => {
+            let val = rows[i][h];
+            // Format money columns neatly
+            if (h === moneyCol && !isNaN(parseFloat(String(val).replace(/[^0-9.-]/g, '')))) {
+                let num = typeof val === 'number' ? val : parseFloat(String(val).replace(/[^0-9.-]/g, ''));
+                val = rp(num);
+                bodyHTML += `<td style="white-space:nowrap; text-align:right;">${val}</td>`;
+            } else {
+                bodyHTML += `<td>${val}</td>`;
+            }
+        });
+        bodyHTML += '</tr>';
+    }
+    if (rows.length > 100) {
+        bodyHTML += `<tr><td colspan="${headers.length}" style="text-align:center; color:var(--text-tertiary);">... dan ${rows.length - 100} baris lainnya (hanya 100 baris pertama yang ditampilkan agar ringan) ...</td></tr>`;
+    }
+    tbody.innerHTML = bodyHTML;
+}
+
+// Drag & drop support for keuangan upload
+const uploadZoneK = document.getElementById('uploadZoneKeuangan');
+const fileInputK = document.getElementById('fileInputKeuangan');
+if(uploadZoneK && fileInputK) {
+    uploadZoneK.addEventListener('click', () => fileInputK.click());
+    uploadZoneK.addEventListener('dragover', (e) => { e.preventDefault(); uploadZoneK.classList.add('dragging'); });
+    uploadZoneK.addEventListener('dragleave', (e) => { e.preventDefault(); uploadZoneK.classList.remove('dragging'); });
+    uploadZoneK.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZoneK.classList.remove('dragging');
+        if (e.dataTransfer.files.length > 0) {
+            fileInputK.files = e.dataTransfer.files;
+            fileInputK.dispatchEvent(new Event('change'));
+        }
+    });
+}
 });
 </script>
 
