@@ -329,23 +329,23 @@
                         </div>
                         <div class="card-body">
                             <div class="form-group" style="margin-bottom: var(--space-4);">
-                                <label style="display:block; margin-bottom: var(--space-2); font-weight: 500; font-size: 14px;">Selling Price / Harga Jual (Rp)</label>
+                                <label style="display:block; margin-bottom: 2px; font-weight: 500; font-size: 14px;">Harga Jual Produk (Rp)</label><div style="font-size:11.5px; color:var(--text-tertiary); margin-bottom:8px;">Harga akhir yang dibayar pembeli di toko</div>
                                 <input type="number" id="simHargaJual" class="form-control" placeholder="Contoh: 100000" oninput="calculateSimulator()" style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md);">
                             </div>
                             <div class="form-group" style="margin-bottom: var(--space-4);">
-                                <label style="display:block; margin-bottom: var(--space-2); font-weight: 500; font-size: 14px;">COGS / Modal (Rp)</label>
+                                <label style="display:block; margin-bottom: 2px; font-weight: 500; font-size: 14px;">Modal Produk (Rp)</label><div style="font-size:11.5px; color:var(--text-tertiary); margin-bottom:8px;">Harga beli dari supplier + ongkos packing</div>
                                 <input type="number" id="simModal" class="form-control" placeholder="Contoh: 40000" oninput="calculateSimulator()" style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md);">
                             </div>
                             <div class="form-group" style="margin-bottom: var(--space-4);">
-                                <label style="display:block; margin-bottom: var(--space-2); font-weight: 500; font-size: 14px;">Admin Fee (%)</label>
+                                <label style="display:block; margin-bottom: 2px; font-weight: 500; font-size: 14px;">Potongan Admin (%)</label><div style="font-size:11.5px; color:var(--text-tertiary); margin-bottom:8px;">Persentase biaya admin dari marketplace</div>
                                 <input type="number" id="simAdminFee" class="form-control" placeholder="Contoh: 6.5" oninput="calculateSimulator()" style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md);" step="0.1">
                             </div>
                             <div class="form-group" style="margin-bottom: var(--space-4);">
-                                <label style="display:block; margin-bottom: var(--space-2); font-weight: 500; font-size: 14px;">Daily Ad Budget (Rp)</label>
+                                <label style="display:block; margin-bottom: 2px; font-weight: 500; font-size: 14px;">Budget Iklan Harian (Rp)</label><div style="font-size:11.5px; color:var(--text-tertiary); margin-bottom:8px;">Batas maksimal pengeluaran iklan dalam 1 hari</div>
                                 <input type="number" id="simBudget" class="form-control" placeholder="Contoh: 100000" oninput="calculateSimulator()" style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md);">
                             </div>
                             <div class="form-group">
-                                <label style="display:block; margin-bottom: var(--space-2); font-weight: 500; font-size: 14px;">Target ROI (ROAS)</label>
+                                <label style="display:block; margin-bottom: 2px; font-weight: 500; font-size: 14px;">Target ROAS Iklan</label><div style="font-size:11.5px; color:var(--text-tertiary); margin-bottom:8px;">Target kelipatan omset dari biaya iklan (misal: 5.0)</div>
                                 <input type="number" id="simTargetRoi" class="form-control" placeholder="Contoh: 5.0" step="0.1" oninput="calculateSimulator()" style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md);">
                             </div>
                         </div>
@@ -356,19 +356,19 @@
                         <div class="stats-grid" style="grid-template-columns: 1fr; margin-bottom: var(--space-4);">
                             <div class="stat-card" style="display:flex; justify-content:space-between; align-items:center;">
                                 <div>
-                                    <div class="stat-title" title="Persentase margin kotor yang tersisa setelah modal dan admin fee">Gross Margin (%) ℹ️</div>
+                                    <div class="stat-title" title="Persentase margin keuntungan setelah dipotong modal & admin (sebelum iklan)">Keuntungan Kotor (%) ℹ️</div>
                                     <div class="stat-value" id="simGrossMargin">0%</div>
                                 </div>
                             </div>
                             <div class="stat-card" style="display:flex; justify-content:space-between; align-items:center;">
                                 <div>
-                                    <div class="stat-title" title="Target ROI minimum absolut agar Anda tidak rugi (Titik Impas)">Breakeven ROI ℹ️</div>
+                                    <div class="stat-title" title="Batas ROAS paling minimal agar iklan tidak rugi/boncos (Titik Impas)">Batas Minimum ROAS ℹ️</div>
                                     <div class="stat-value" id="simBreakevenRoi" style="color: var(--brand-primary);">0.0</div>
                                 </div>
                             </div>
                             <div class="stat-card" style="display:flex; justify-content:space-between; align-items:center;">
                                 <div>
-                                    <div class="stat-title">Net Profit per Item (after Ads)</div>
+                                    <div class="stat-title" title="Sisa uang masuk kantong per produk setelah potong modal, admin, dan iklan">Keuntungan Bersih (Per Produk) ℹ️</div>
                                     <div class="stat-value" id="simNetProfit">Rp 0</div>
                                 </div>
                             </div>
@@ -377,7 +377,7 @@
                         <!-- Burn Rate Indicator -->
                         <div class="card" style="border: 1px solid var(--border-light); box-shadow:none;">
                             <div class="card-body">
-                                <div style="font-weight: 600; margin-bottom: 8px;" title="Seberapa cepat Daily Budget Anda akan habis berdasarkan setingan Target ROI">Burn Rate Indicator ℹ️</div>
+                                <div style="font-weight: 600; margin-bottom: 8px;" title="Simulasi berapa banyak barang yang harus terjual sebelum budget iklan harian Anda habis">Simulasi Target & Ketahanan Budget Iklan ℹ️</div>
                                 <div id="simBurnRateAlert" style="padding: 16px; border-radius: var(--radius-md); background: var(--bg-tertiary); color: var(--text-secondary); font-size: 14px; line-height: 1.5;">
                                     Silakan isi data di sebelah kiri untuk melihat simulasi strategi iklan Anda.
                                 </div>
