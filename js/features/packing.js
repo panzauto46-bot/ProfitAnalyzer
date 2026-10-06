@@ -1,3 +1,14 @@
+
+window.ordersData = [];
+window.ordersStats = {
+    total: 0,
+    perluDikirim: 0,
+    dikirim: 0,
+    selesai: 0,
+    qty: 0,
+    kurir: {}
+};
+
 function updatePacking() {
     if (!rawRows || rawRows.length === 0) return;
 
@@ -26,7 +37,7 @@ function updatePacking() {
         if (isResultsArea) isResultsArea.style.display = 'none';
         if (warningState) {
             warningState.style.display = 'flex';
-            document.getElementById('packingWarningText').innerText = "File yang diupload bukan file Pesanan (Order to Ship). Silakan upload file dengan format Pesanan Perlu Dikirim.";
+            document.getElementById('packingWarningText').innerText = "File yang diupload bukan file Pesanan. Silakan pastikan file mengandung No. Pesanan, Nama Produk, dan Jumlah.";
         }
         return;
     }
@@ -36,8 +47,7 @@ function updatePacking() {
     if (isResultsArea) isResultsArea.style.display = 'block';
 
     const ordersMap = {};
-    let totalBarang = 0;
-    let kurirMap = {};
+    window.ordersStats = { total: 0, perluDikirim: 0, dikirim: 0, selesai: 0, qty: 0, kurir: {} };
 
     for (let i = 0; i < rawRows.length; i++) {
         const row = rawRows[i];
@@ -51,7 +61,7 @@ function updatePacking() {
                 noPesanan,
                 resi: idxResi !== undefined ? String(row[idxResi] || '').trim() : '-',
                 kurir: idxKurir !== undefined ? String(row[idxKurir] || '').trim() : '-',
-                status: idxStatus !== undefined ? String(row[idxStatus] || '').trim() : '',
+                status: idxStatus !== undefined ? String(row[idxStatus] || '').trim() : 'Semua', // fallback
                 items: []
             };
         }
@@ -59,12 +69,12 @@ function updatePacking() {
         const kurir = ordersMap[noPesanan].kurir;
         if (kurir && kurir !== '-') {
             let kClean = kurir.replace('Reguler (Cashless)-', '').trim();
-            kurirMap[kClean] = true;
+            window.ordersStats.kurir[kClean] = true;
             ordersMap[noPesanan].kurir = kClean; 
         }
 
         const jumlah = parseFloat(row[idxJumlah] || 0) || 0;
-        totalBarang += jumlah;
+        window.ordersStats.qty += jumlah;
 
         ordersMap[noPesanan].items.push({
             produk: String(row[idxProduk] || '').trim(),
@@ -74,13 +84,85 @@ function updatePacking() {
         });
     }
 
-    const totalPesanan = Object.keys(ordersMap).length;
+    window.ordersData = Object.values(ordersMap);
+    
+    // Calculate stats
+    window.ordersData.forEach(o => {
+        window.ordersStats.total++;
+        let st = o.status.toLowerCase();
+        if (st.includes('perlu dikirim')) window.ordersStats.perluDikirim++;
+        else if (st.includes('dikirim') || st.includes('sedang dikirim')) window.ordersStats.dikirim++;
+        else if (st.includes('selesai')) window.ordersStats.selesai++;
+    });
+
+    // Update filter kurir dropdown
+    const kurirSelect = document.getElementById('packingKurirFilter');
+    if (kurirSelect) {
+        let htmlKurir = '<option value="all">Semua Ekspedisi</option>';
+        Object.keys(window.ordersStats.kurir).forEach(k => {
+            htmlKurir += `<option value="${k}">${k}</option>`;
+        });
+        kurirSelect.innerHTML = htmlKurir;
+    }
+
+    renderPackingList();
+}
+
+function renderPackingList() {
     const container = document.getElementById('packingListContainer');
-    if (!container) return; 
+    if (!container) return;
+
+    let tab = window.currentOrderTab || 'Semua';
+    let filteredOrders = window.ordersData;
+
+    // Filter by Tab
+    if (tab === 'Perlu Dikirim') {
+        filteredOrders = window.ordersData.filter(o => o.status.toLowerCase().includes('perlu dikirim'));
+    } else if (tab === 'Dikirim') {
+        filteredOrders = window.ordersData.filter(o => {
+            let st = o.status.toLowerCase();
+            return (st.includes('dikirim') || st.includes('sedang dikirim')) && !st.includes('perlu dikirim');
+        });
+    } else if (tab === 'Selesai') {
+        filteredOrders = window.ordersData.filter(o => o.status.toLowerCase().includes('selesai'));
+    } else if (tab === 'Dashboard') {
+        container.innerHTML = '<div style="text-align:center; padding: 40px; color: var(--text-secondary);">Tampilan Dashboard Ringkasan Data (Coming Soon)</div>';
+        
+        // Update stats top row
+        document.getElementById('packingStatPesanan').innerText = window.ordersStats.total.toLocaleString('id-ID');
+        document.getElementById('packingStatBarang').innerText = window.ordersStats.qty.toLocaleString('id-ID');
+        return;
+    }
+
+    // Filter by Kurir Dropdown
+    const kurirSelect = document.getElementById('packingKurirFilter');
+    if (kurirSelect && kurirSelect.value !== 'all') {
+        filteredOrders = filteredOrders.filter(o => o.kurir === kurirSelect.value);
+    }
+
+    // Update Counts in Tabs UI
+    const countPerlu = document.getElementById('count-perlu-dikirim');
+    const countDikirim = document.getElementById('count-dikirim');
+    const countSelesai = document.getElementById('count-selesai');
+    
+    if (countPerlu) countPerlu.innerText = window.ordersStats.perluDikirim;
+    if (countDikirim) countDikirim.innerText = window.ordersStats.dikirim;
+    if (countSelesai) countSelesai.innerText = window.ordersStats.selesai;
+
+    // Update Dashboard global stats
+    const totalPesananEl = document.getElementById('packingStatPesanan');
+    const totalBarangEl = document.getElementById('packingStatBarang');
+    if (totalPesananEl) totalPesananEl.innerText = filteredOrders.length.toLocaleString('id-ID');
+    // Calculate qty for filtered
+    let filteredQty = 0;
+    filteredOrders.forEach(o => {
+        o.items.forEach(i => { filteredQty += i.jumlah; });
+    });
+    if (totalBarangEl) totalBarangEl.innerText = filteredQty.toLocaleString('id-ID');
 
     let html = '';
     
-    Object.values(ordersMap).forEach(order => {
+    filteredOrders.forEach(order => {
         let itemsHtml = '';
         order.items.forEach((item, idx) => {
             const isLast = idx === order.items.length - 1;
@@ -101,61 +183,64 @@ function updatePacking() {
             `;
         });
 
-        const statusBadge = order.status ? `<span style="background: #fef3c7; color: #b45309; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">${order.status}</span>` : '';
+        // Determine Status Badge Color
+        let stBadgeColor = 'background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0;'; // default grey
+        let stText = order.status.toLowerCase();
+        if (stText.includes('perlu dikirim')) {
+            stBadgeColor = 'background: #fff7ed; color: #c2410c; border: 1px solid #ffedd5;'; // orange
+        } else if (stText.includes('dikirim') || stText.includes('sedang dikirim')) {
+            stBadgeColor = 'background: #eff6ff; color: #1d4ed8; border: 1px solid #dbeafe;'; // blue
+        } else if (stText.includes('selesai')) {
+            stBadgeColor = 'background: #f0fdf4; color: #15803d; border: 1px solid #dcfce7;'; // green
+        } else if (stText.includes('batal')) {
+            stBadgeColor = 'background: #fef2f2; color: #b91c1c; border: 1px solid #fee2e2;'; // red
+        }
+
+        const isSelesai = localStorage.getItem('order_selesai_' + order.noPesanan) === 'true';
+        const checkboxState = isSelesai ? 'checked' : '';
+        const bgRow = isSelesai ? '#f8fafc' : '#ffffff';
+        const opRow = isSelesai ? '0.85' : '1';
 
         html += `
-            <div class="order-card" data-kurir="${order.kurir}" style="border: 1px solid var(--border-light); border-radius: var(--radius-lg); background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.02); overflow: hidden; transition: all 0.2s;">
-                <div style="background: #f8fafc; padding: 12px 16px; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div class="packing-order-card" id="card_${order.noPesanan}" style="background: ${bgRow}; opacity: ${opRow}; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); transition: all 0.3s ease;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border-light); padding-bottom: 12px;">
                     <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                        <span style="font-weight: 800; color: var(--text-primary); font-size: 14px;">${order.noPesanan}</span>
-                        ${statusBadge}
-                        <span style="background: #e2e8f0; color: #334155; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;"><i class="ti ti-truck"></i> ${order.kurir}</span>
-                        <span style="color: #64748b; font-size: 12px; font-family: monospace; font-weight: 500;"><i class="ti ti-barcode"></i> Resi: ${order.resi}</span>
+                        <span style="font-weight: 700; color: var(--text-primary); font-size: 14px;">${order.noPesanan}</span>
+                        <span style="font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 12px; ${stBadgeColor}">${order.status || 'Baru'}</span>
+                        <span style="font-size: 11px; font-weight: 600; color: #334155; background: #f1f5f9; padding: 3px 8px; border-radius: 12px; display:flex; align-items:center; gap:4px;"><i class="ti ti-truck-delivery"></i> ${order.kurir}</span>
+                        <span style="font-size: 11px; color: #64748b; font-family: monospace; letter-spacing: 0.5px;">Resi: ${order.resi}</span>
                     </div>
-                    <div>
-                        <label style="cursor:pointer; display:inline-flex; align-items:center; gap:8px; padding: 6px 12px; background: #fff; border: 1px solid #cbd5e1; border-radius: 20px; transition: all 0.2s;">
-                            <input type="checkbox" onchange="togglePackedCheckbox(this)" style="width:16px; height:16px; accent-color: var(--brand-primary); cursor:pointer;">
-                            <span class="status-text" style="font-weight:700; color:#64748b; font-size:12px;">Belum Packing</span>
+                    
+                    <div style="display:flex; align-items:center; gap: 8px;">
+                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size: 12px; font-weight:600; color: #475569; background: white; padding: 6px 12px; border-radius: 20px; border: 1px solid #cbd5e1; transition:all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05);" class="packing-checkbox-label">
+                            <input type="checkbox" onchange="togglePackedCheckbox(this)" ${checkboxState} style="width: 14px; height: 14px; accent-color: var(--brand-primary); cursor:pointer;">
+                            <span class="lbl-text">${isSelesai ? 'SUDAH PACKING' : 'Belum Packing'}</span>
                         </label>
                     </div>
                 </div>
-                <div style="padding: 16px;">
+                
+                <div>
                     ${itemsHtml}
                 </div>
             </div>
         `;
     });
 
+    if (filteredOrders.length === 0) {
+        html = `<div style="text-align:center; padding: 40px; color: var(--text-secondary);">Tidak ada pesanan untuk status: ${tab}</div>`;
+    }
+
     container.innerHTML = html;
 
-    if (document.getElementById('packingStatPesanan')) {
-        document.getElementById('packingStatPesanan').innerText = totalPesanan.toLocaleString('id-ID');
-    }
-    if (document.getElementById('packingStatBarang')) {
-        document.getElementById('packingStatBarang').innerText = totalBarang.toLocaleString('id-ID');
-    }
-
-    const filterSelect = document.getElementById('packingKurirFilter');
-    if (filterSelect) {
-        let options = '<option value="all">Semua Ekspedisi</option>';
-        Object.keys(kurirMap).sort().forEach(k => {
-            options += `<option value="${k}">${k}</option>`;
-        });
-        filterSelect.innerHTML = options;
-    }
+    // Trigger UI updates for checkboxes
+    filteredOrders.forEach(order => {
+        const isSelesai = localStorage.getItem('order_selesai_' + order.noPesanan) === 'true';
+        // No updateCardUI needed if it doesn't exist
+    });
 }
 
 function filterPackingByKurir() {
-    const val = document.getElementById('packingKurirFilter').value;
-    const cards = document.querySelectorAll('.order-card');
-    cards.forEach(card => {
-        if (val === 'all') {
-            card.style.display = 'block';
-        } else {
-            const rowKurir = card.getAttribute('data-kurir') || '';
-            card.style.display = (rowKurir === val) ? 'block' : 'none';
-        }
-    });
+    renderPackingList();
 }
 
 function togglePackedCheckbox(checkbox) {
@@ -231,4 +316,5 @@ function switchOrderTab(tabName) {
         activeEl.style.borderBottom = '3px solid var(--brand-primary)';
         activeEl.classList.add('active');
     }
+    if (typeof renderPackingList === 'function') renderPackingList();
 }
