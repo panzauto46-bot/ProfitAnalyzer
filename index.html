@@ -520,15 +520,15 @@
             
             <div id="packingEmptyState" class="empty-state">
                 <div class="empty-state-icon"><i class="ti ti-box"></i></div>
-                <div class="empty-state-title">Belum ada file pesanan (Order to Ship)</div>
-                <div class="empty-state-desc">Upload file "Pesanan Perlu Dikirim" dari Shopee/TikTok untuk mulai.</div>
-                <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()" style="margin-top: 16px; border-radius: var(--radius-full);"><i class="ti ti-upload"></i> Pilih File Pesanan</button>
+                <h3>Belum ada file pesanan (Order to Ship)</h3>
+                <p>Upload file "Pesanan Perlu Dikirim" dari Shopee/TikTok untuk mulai.</p>
+                <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()" style="margin-top: 16px; border-radius: var(--radius-full); width: auto; padding: 12px 32px; margin-left: auto; margin-right: auto;"><i class="ti ti-upload"></i> Pilih File Pesanan</button>
             </div>
 
             <div id="packingWarningState" class="empty-state" style="display:none; background:#fff5f5; border:1px solid #fee2e2;">
                 <div class="empty-state-icon" style="background:#fee2e2; color:#ef4444;"><i class="ti ti-alert-triangle"></i></div>
-                <div class="empty-state-title" style="color:#ef4444;">Format File Tidak Sesuai</div>
-                <div class="empty-state-desc" id="packingWarningText">File yang diupload bukan file Pesanan. Silakan upload file dengan format Pesanan Perlu Dikirim (Order to Ship).</div>
+                <h3 style="color:#ef4444; margin-top:0;">Format File Tidak Sesuai</h3>
+                <p id="packingWarningText">File yang diupload bukan file Pesanan. Silakan upload file dengan format Pesanan Perlu Dikirim (Order to Ship).</p>
             </div>
 
             <div id="packingResultsArea" style="display:none;">
@@ -623,3 +623,5 @@
 
 
 </body></html>
+
+
