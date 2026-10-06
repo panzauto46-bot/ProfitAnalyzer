@@ -1400,3 +1400,32 @@
 .analyzer-left-panel .sidebar-section-title:first-child {
     margin-top: 0;
 }
+
+
+.btn {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: var(--font);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all var(--duration-normal) var(--ease-out);
+    outline: none;
+    border: 1px solid transparent;
+}
+.btn-outline {
+    background: transparent;
+    color: var(--text-secondary);
+    border-color: var(--border-light);
+}
+.btn-outline:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    transform: translateY(-1px);
+}
+.btn-outline:active {
+    transform: translateY(0);
+}
