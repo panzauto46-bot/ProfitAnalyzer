@@ -37,6 +37,7 @@ function switchTab(tab) {
     document.getElementById('tabData').style.display = tab === 'data' ? 'block' : 'none';
     document.getElementById('tabIklan').style.display = tab === 'iklan' ? 'block' : 'none';
     document.getElementById('tabKeuangan').style.display = tab === 'keuangan' ? 'block' : 'none';
+    document.getElementById('tabPacking').style.display = tab === 'packing' ? 'block' : 'none';
 }
 
 
@@ -112,6 +113,7 @@ function processFile(file) {
         
         // Update Iklan Toko Tab
         updateIklanToko();
+        if (typeof updatePacking === 'function') updatePacking();
 
         showToast(`File "${file.name}" berhasil diproses — ${rows.length} baris`, 'success');
 
@@ -301,7 +303,8 @@ function updateMapping(key, value) {
     columnMapping[key] = parseInt(value);
     renderMappingUI(rawHeaders);
     renderDataPreview(); // Refresh highlight
-    updateIklanToko(); // Refresh Iklan Toko tab
+    updateIklanToko();
+        if (typeof updatePacking === 'function') updatePacking(); // Refresh Iklan Toko tab
 }
 
 function allColumnsMapped() {
