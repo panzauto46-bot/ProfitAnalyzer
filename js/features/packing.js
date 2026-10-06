@@ -47,8 +47,6 @@ function updatePacking() {
     let kurirMap = {}; // for filter options
 
     const tbody = document.getElementById('packingTableBody');
-    let rowsHtml = '';
-    
     // Keep track of unique orders to count properly
         const idxUsername = hMap["username (pembeli)"] || hMap["username"];
     const idxTotalPay = hMap["total pembayaran"];
@@ -173,7 +171,7 @@ totalPesanan = uniqueOrders.size;
         filterSelect.innerHTML = options;
     }
 
-    if (tbody) tbody.innerHTML = rowsHtml;
+    if (tbody) tbody.innerHTML = cardsHtml;
 }
 
 function filterPackingByKurir() {
@@ -219,3 +217,4 @@ function printSimpleLabel(noPesanan) {
     `);
     w.document.close();
 }
+
