@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "com.ecommerce.profit.app-merged_res-40:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.ecommerce.profit.app-main-42:/mipmap-anydpi-v26/ic_launcher.xml"
+    },
+    {
+        "merged": "com.ecommerce.profit.app-merged_res-40:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "com.ecommerce.profit.app-main-42:/drawable/ic_launcher_foreground.xml"
+    }
+]

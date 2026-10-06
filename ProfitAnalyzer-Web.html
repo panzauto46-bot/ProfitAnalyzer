@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Commerce Profit Analyzer</title>
+    <!-- SheetJS for Excel parsing -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --green: #16a34a;
+            --green-bg: #f0fdf4;
+            --green-border: #bbf7d0;
+            --red: #dc2626;
+            --red-bg: #fef2f2;
+            --red-border: #fecaca;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-700: #374151;
+            --gray-900: #111827;
+            --radius: 12px;
+            --shadow: 0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -4px rgba(0,0,0,.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-900);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 24px 16px 48px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .header p {
+            font-size: 14px;
+            color: var(--gray-500);
+        }
+
+        /* Cards */
+        .card {
+            background: #fff;
+            border-radius: var(--radius);
+            border: 1px solid var(--gray-200);
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+        }
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .step-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* File Upload */
+        .upload-zone {
+            border: 2px dashed var(--gray-200);
+            border-radius: 8px;
+            padding: 32px 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all .2s;
+            position: relative;
+        }
+        .upload-zone:hover { border-color: var(--primary); background: #eff6ff; }
+        .upload-zone.has-file { border-color: var(--green); background: var(--green-bg); border-style: solid; }
+        .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+        .upload-icon { font-size: 36px; margin-bottom: 8px; }
+        .upload-text { font-size: 14px; color: var(--gray-500); }
+        .upload-text strong { color: var(--primary); }
+        .file-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--green);
+            margin-top: 8px;
+            word-break: break-all;
+        }
+
+        /* Inputs */
+        .form-group { margin-bottom: 14px; }
+        .form-group:last-child { margin-bottom: 0; }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: 6px;
+        }
+        .input-wrap {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: border-color .2s;
+        }
+        .input-wrap:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+        .input-wrap input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 10px 12px;
+            font-size: 15px;
+            font-family: inherit;
+        }
+        .input-suffix {
+            padding: 10px 12px;
+            background: var(--gray-100);
+            color: var(--gray-500);
+            font-size: 13px;
+            font-weight: 500;
+            border-left: 1px solid var(--gray-200);
+        }
+
+        /* Button */
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .15s;
+            font-family: inherit;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+        .btn-primary:active { transform: translateY(0); }
+        .btn-primary:disabled { background: var(--gray-400); cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* Results */
+        #results { display: none; }
+        #results.show { display: block; animation: slideUp .3s ease-out; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 13px;
+        }
+        .result-row .label { color: var(--gray-500); }
+        .result-row .value { font-weight: 500; text-align: right; }
+        .result-divider {
+            height: 1px;
+            background: var(--gray-200);
+            margin: 12px 0;
+        }
+        .profit-box {
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 8px;
+        }
+        .profit-box.positive { background: var(--green-bg); border: 1px solid var(--green-border); }
+        .profit-box.negative { background: var(--red-bg); border: 1px solid var(--red-border); }
+        .profit-label {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .profit-value {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .profit-box.positive .profit-label,
+        .profit-box.positive .profit-value { color: var(--green); }
+        .profit-box.negative .profit-label,
+        .profit-box.negative .profit-value { color: var(--red); }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: #dc2626;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            z-index: 1000;
+            transition: transform .3s ease;
+            max-width: 90%;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* Preview Table */
+        .preview-info {
+            margin-top: 12px;
+            padding: 10px 12px;
+            background: var(--gray-50);
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+        .preview-info strong { color: var(--gray-700); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>📊 E-Commerce Profit Analyzer</h1>
+        <p>Hitung profit bersih dari laporan TikTok Shop & Tokopedia</p>
+    </div>
+
+    <!-- Step 1: Import -->
+    <div class="card">
+        <div class="card-title"><span class="step-badge">1</span> Import Data</div>
+        <div class="upload-zone" id="uploadZone">
+            <input type="file" id="fileInput" accept=".csv,.xlsx,.xls">
+            <div class="upload-icon">📁</div>
+            <div class="upload-text">
+                <strong>Klik untuk pilih file</strong><br>
+                Format: CSV atau Excel (.xlsx)
+            </div>
+            <div class="file-name" id="fileName"></div>
+        </div>
+        <div class="preview-info" id="previewInfo" style="display:none"></div>
+    </div>
+
+    <!-- Step 2: Variables -->
+    <div class="card">
+        <div class="card-title"><span class="step-badge">2</span> Masukkan Variabel</div>
+        <div class="form-group">
+            <label>Platform Admin Fee</label>
+            <div class="input-wrap">
+                <input type="number" id="adminFee" placeholder="contoh: 6.5" step="0.1" min="0">
+                <span class="input-suffix">%</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>COGS / Modal per Item</label>
+            <div class="input-wrap">
+                <input type="number" id="cogsInput" placeholder="contoh: 50000" min="0">
+                <span class="input-suffix">IDR</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 3: Calculate -->
+    <button class="btn btn-primary" id="calcBtn" onclick="calculate()">
+        Hitung Profit
+    </button>
+
+    <!-- Step 4: Results -->
+    <div id="results" class="card" style="margin-top:16px">
+        <div class="card-title"><span class="step-badge">✓</span> Hasil Kalkulasi</div>
+        <div class="result-row">
+            <span class="label">Total Pendapatan Kotor</span>
+            <span class="value" id="rGross"></span>
+        </div>
+        <div class="result-row">
+            <span class="label">Total Biaya Iklan</span>
+            <span class="value" id="rAdSpend"></span>
+        </div>
+        <div class="result-row">
+            <span class="label">Total Pesanan</span>
+            <span class="value" id="rOrders"></span>
+        </div>
+        <div class="result-row">
+            <span class="label" id="rAdminLabel">Potongan Admin Fee</span>
+            <span class="value" id="rAdmin"></span>
+        </div>
+        <div class="result-row">
+            <span class="label">Potongan Modal (COGS)</span>
+            <span class="value" id="rCogs"></span>
+        </div>
+        <div class="result-divider"></div>
+        <div class="profit-box" id="profitBox">
+            <div class="profit-label" id="profitLabel"></div>
+            <div class="profit-value" id="profitValue"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── State ───────────────────────────────────────
+let parsedData = null; // { adSpend, grossRevenue, totalOrders }
+
+// ─── Number Formatting (IDR) ─────────────────────
+function formatIDR(num) {
+    const formatted = new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(num);
+    return formatted;
+}
+
+// ─── Indonesian Number Parser ────────────────────
+function parseNumber(str) {
+    if (str == null) return 0;
+    str = String(str).trim();
+    if (str === '') return 0;
+
+    // If it's already a number, return it
+    if (typeof str === 'number') return str;
+    const directNum = Number(str);
+    if (!isNaN(directNum) && str !== '') return directNum;
+
+    // Remove currency symbols and spaces
+    let cleaned = str.replace(/[^0-9.,\-]/g, '');
+    if (cleaned === '') return 0;
+
+    const dotCount = (cleaned.match(/\./g) || []).length;
+    const commaCount = (cleaned.match(/,/g) || []).length;
+
+    let normalized;
+    if (dotCount > 1 || (dotCount >= 1 && commaCount === 1)) {
+        // Indonesian: "1.500.000,50" or "1.500.000"
+        normalized = cleaned.replace(/\./g, '').replace(',', '.');
+    } else if (commaCount > 1) {
+        // Thousands commas: "1,500,000"
+        normalized = cleaned.replace(/,/g, '');
+    } else if (commaCount === 1 && dotCount === 0) {
+        const afterComma = cleaned.split(',')[1];
+        if (afterComma.length <= 2) {
+            normalized = cleaned.replace(',', '.'); // Decimal comma
+        } else {
+            normalized = cleaned.replace(',', ''); // Thousands comma
+        }
+    } else {
+        normalized = cleaned;
+    }
+
+    return parseFloat(normalized) || 0;
+}
+
+// ─── Toast ───────────────────────────────────────
+function showToast(msg, duration = 3000) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), duration);
+}
+
+// ─── File Handler ────────────────────────────────
+document.getElementById('fileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const zone = document.getElementById('uploadZone');
+    const nameEl = document.getElementById('fileName');
+    const previewEl = document.getElementById('previewInfo');
+
+    nameEl.textContent = '⏳ Memproses...';
+    zone.classList.add('has-file');
+
+    const ext = file.name.split('.').pop().toLowerCase();
+
+    if (ext === 'csv') {
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            try {
+                parsedData = parseCSV(ev.target.result);
+                nameEl.textContent = '✓ ' + file.name;
+                showPreview(parsedData, file.name);
+            } catch (err) {
+                parsedData = null;
+                zone.classList.remove('has-file');
+                nameEl.textContent = '';
+                previewEl.style.display = 'none';
+                showToast(err.message);
+            }
+        };
+        reader.readAsText(file);
+    } else if (ext === 'xlsx' || ext === 'xls') {
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            try {
+                parsedData = parseExcel(ev.target.result);
+                nameEl.textContent = '✓ ' + file.name;
+                showPreview(parsedData, file.name);
+            } catch (err) {
+                parsedData = null;
+                zone.classList.remove('has-file');
+                nameEl.textContent = '';
+                previewEl.style.display = 'none';
+                showToast(err.message);
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    } else {
+        showToast('Format file tidak didukung. Gunakan CSV atau Excel (.xlsx)');
+        zone.classList.remove('has-file');
+        nameEl.textContent = '';
+    }
+});
+
+function showPreview(data, filename) {
+    const el = document.getElementById('previewInfo');
+    el.innerHTML = `<strong>Data terdeteksi:</strong> ${data.rowCount} baris data &nbsp;·&nbsp; Pendapatan: ${formatIDR(data.grossRevenue)} &nbsp;·&nbsp; Pesanan: ${data.totalOrders.toLocaleString('id-ID')}`;
+    el.style.display = 'block';
+}
+
+// ─── CSV Parser ──────────────────────────────────
+function parseCSV(text) {
+    // Smart CSV parser that handles quoted fields
+    const lines = [];
+    let current = '';
+    let inQuotes = false;
+
+    for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        if (ch === '"') {
+            inQuotes = !inQuotes;
+        } else if ((ch === '\n' || ch === '\r') && !inQuotes) {
+            if (current.trim()) lines.push(current);
+            current = '';
+            if (ch === '\r' && text[i + 1] === '\n') i++;
+        } else {
+            current += ch;
+        }
+    }
+    if (current.trim()) lines.push(current);
+
+    if (lines.length === 0) throw new Error('File kosong');
+
+    // Detect delimiter (comma, semicolon, or tab)
+    const firstLine = lines[0];
+    let delimiter = ',';
+    if (firstLine.split(';').length > firstLine.split(',').length) delimiter = ';';
+    if (firstLine.split('\t').length > firstLine.split(delimiter).length) delimiter = '\t';
+
+    function splitRow(line) {
+        const fields = [];
+        let field = '';
+        let inQ = false;
+        for (let i = 0; i < line.length; i++) {
+            const ch = line[i];
+            if (ch === '"') {
+                inQ = !inQ;
+            } else if (ch === delimiter && !inQ) {
+                fields.push(field.trim());
+                field = '';
+            } else {
+                field += ch;
+            }
+        }
+        fields.push(field.trim());
+        return fields;
+    }
+
+    const header = splitRow(lines[0]);
+    const adSpendIdx = header.indexOf('Biaya');
+    const grossRevIdx = header.indexOf('Pendapatan kotor');
+    const ordersIdx = header.indexOf('Pesanan');
+
+    if (adSpendIdx === -1 || grossRevIdx === -1 || ordersIdx === -1) {
+        throw new Error('Invalid file format. Required columns not found.\nKolom yang dibutuhkan: Biaya, Pendapatan kotor, Pesanan');
+    }
+
+    let adSpend = 0, grossRevenue = 0, totalOrders = 0, rowCount = 0;
+
+    for (let i = 1; i < lines.length; i++) {
+        const row = splitRow(lines[i]);
+        const maxIdx = Math.max(adSpendIdx, grossRevIdx, ordersIdx);
+        if (row.length <= maxIdx) continue;
+
+        adSpend += parseNumber(row[adSpendIdx]);
+        grossRevenue += parseNumber(row[grossRevIdx]);
+        totalOrders += parseNumber(row[ordersIdx]);
+        rowCount++;
+    }
+
+    return { adSpend, grossRevenue, totalOrders, rowCount };
+}
+
+// ─── Excel Parser (via SheetJS) ──────────────────
+function parseExcel(arrayBuffer) {
+    const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+
+    if (rows.length === 0) throw new Error('Excel file kosong');
+
+    const header = rows[0].map(h => String(h).trim());
+    const adSpendIdx = header.indexOf('Biaya');
+    const grossRevIdx = header.indexOf('Pendapatan kotor');
+    const ordersIdx = header.indexOf('Pesanan');
+
+    if (adSpendIdx === -1 || grossRevIdx === -1 || ordersIdx === -1) {
+        throw new Error('Invalid file format. Required columns not found.\nKolom yang dibutuhkan: Biaya, Pendapatan kotor, Pesanan');
+    }
+
+    let adSpend = 0, grossRevenue = 0, totalOrders = 0, rowCount = 0;
+
+    for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        const maxIdx = Math.max(adSpendIdx, grossRevIdx, ordersIdx);
+        if (row.length <= maxIdx) continue;
+
+        adSpend += parseNumber(row[adSpendIdx]);
+        grossRevenue += parseNumber(row[grossRevIdx]);
+        totalOrders += parseNumber(row[ordersIdx]);
+        rowCount++;
+    }
+
+    return { adSpend, grossRevenue, totalOrders, rowCount };
+}
+
+// ─── Calculate ───────────────────────────────────
+function calculate() {
+    if (!parsedData) {
+        showToast('Silakan import file terlebih dahulu');
+        return;
+    }
+
+    const adminFee = parseFloat(document.getElementById('adminFee').value);
+    const cogs = parseFloat(document.getElementById('cogsInput').value);
+
+    if (isNaN(adminFee) || isNaN(cogs)) {
+        showToast('Masukkan angka Admin Fee dan COGS yang valid');
+        return;
+    }
+
+    const { adSpend, grossRevenue, totalOrders } = parsedData;
+
+    // Formula sesuai PRD
+    const adminFeeDeduction = grossRevenue * (adminFee / 100);
+    const cogsDeduction = totalOrders * cogs;
+    const netProfit = grossRevenue - adSpend - adminFeeDeduction - cogsDeduction;
+
+    // Render results
+    document.getElementById('rGross').textContent = formatIDR(grossRevenue);
+    document.getElementById('rAdSpend').textContent = '- ' + formatIDR(adSpend);
+    document.getElementById('rOrders').textContent = Math.floor(totalOrders).toLocaleString('id-ID') + ' pesanan';
+    document.getElementById('rAdminLabel').textContent = `Potongan Admin Fee (${adminFee}%)`;
+    document.getElementById('rAdmin').textContent = '- ' + formatIDR(adminFeeDeduction);
+    document.getElementById('rCogs').textContent = '- ' + formatIDR(cogsDeduction);
+
+    const box = document.getElementById('profitBox');
+    const isPositive = netProfit >= 0;
+    box.className = 'profit-box ' + (isPositive ? 'positive' : 'negative');
+    document.getElementById('profitLabel').textContent = isPositive ? 'UNTUNG ✓' : 'RUGI ✗';
+    document.getElementById('profitValue').textContent = formatIDR(netProfit);
+
+    const resultsEl = document.getElementById('results');
+    resultsEl.classList.remove('show');
+    // Trigger reflow for animation
+    void resultsEl.offsetWidth;
+    resultsEl.style.display = 'block';
+    resultsEl.classList.add('show');
+
+    // Scroll to results
+    setTimeout(() => resultsEl.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+}
+</script>
+
+</body>
+</html>

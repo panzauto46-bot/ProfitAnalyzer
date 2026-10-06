@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ic_launcher_background">#1B5E20</color>
+    <color name="loss_red">#CC0000</color>
+    <color name="profit_green">#006400</color>
+    <string name="app_name">Profit Analyzer</string>
+</resources>
