@@ -1,19 +1,13 @@
-function updatePacking() {
+﻿function updatePacking() {
     if (!rawRows || rawRows.length === 0) return;
 
-    // Detect if this is an "Order to Ship" file by checking specific columns
-    // Common columns in Shopee To Ship file:
-    // "No. Pesanan", "No. Resi", "Opsi Pengiriman", "Nama Produk"
-    
-    // First, find header index map
     const headers = rawHeaders || rawRows[0] || [];
     const hMap = {};
-    for (let i = 0; i < headers.length; i++) {
+    for (let i = 0; i < headers.length;i++) {
         const val = String(headers[i] || '').trim().toLowerCase();
         hMap[val] = i;
     }
 
-    // Try to find required columns
     const idxNoPesanan = hMap['no. pesanan'];
     const idxResi = hMap['no. resi'];
     const idxKurir = hMap['opsi pengiriman'] || hMap['jasa kirim'];
@@ -21,13 +15,13 @@ function updatePacking() {
     const idxVariasi = hMap['nama variasi'];
     const idxJumlah = hMap['jumlah'];
     const idxCatatan = hMap['catatan dari pembeli'] || hMap['catatan pembeli'];
+    const idxStatus = hMap['status pesanan'];
 
     const isEmptyState = document.getElementById('packingEmptyState');
     const isResultsArea = document.getElementById('packingResultsArea');
     const warningState = document.getElementById('packingWarningState');
 
     if (idxNoPesanan === undefined || idxProduk === undefined || idxJumlah === undefined) {
-        // Not a packing file
         if (isEmptyState) isEmptyState.style.display = 'none';
         if (isResultsArea) isResultsArea.style.display = 'none';
         if (warningState) {
@@ -37,92 +31,110 @@ function updatePacking() {
         return;
     }
 
-    // It is a packing file!
     if (warningState) warningState.style.display = 'none';
     if (isEmptyState) isEmptyState.style.display = 'none';
     if (isResultsArea) isResultsArea.style.display = 'block';
 
-    let totalPesanan = 0;
+    const ordersMap = {};
     let totalBarang = 0;
-    let kurirMap = {}; // for filter options
+    let kurirMap = {};
 
-    const tbody = document.getElementById('packingTableBody');
-    let rowsHtml = '';
-    
-    // Keep track of unique orders to count properly
-    const uniqueOrders = new Set();
-
-        for (let i = 0; i < rawRows.length; i++) {
+    for (let i = 0; i < rawRows.length; i++) {
         const row = rawRows[i];
         if (!row || row.length === 0) continue;
 
         const noPesanan = String(row[idxNoPesanan] || '').trim();
         if (!noPesanan) continue;
 
-        uniqueOrders.add(noPesanan);
-
-        const resi = idxResi !== undefined ? String(row[idxResi] || '').trim() : '-';
-        const kurir = idxKurir !== undefined ? String(row[idxKurir] || '').trim() : '-';
-        const produk = String(row[idxProduk] || '').trim();
-        const variasi = idxVariasi !== undefined ? String(row[idxVariasi] || '').trim() : '';
-        const jumlah = parseFloat(row[idxJumlah] || 0) || 0;
-        const catatan = idxCatatan !== undefined ? String(row[idxCatatan] || '').trim() : '';
-
-        totalBarang += jumlah;
-        
-        if (kurir && kurir !== '-') {
-            kurirMap[kurir] = true;
+        if (!ordersMap[noPesanan]) {
+            ordersMap[noPesanan] = {
+                noPesanan,
+                resi: idxResi !== undefined ? String(row[idxResi] || '').trim() : '-',
+                kurir: idxKurir !== undefined ? String(row[idxKurir] || '').trim() : '-',
+                status: idxStatus !== undefined ? String(row[idxStatus] || '').trim() : '',
+                items: []
+            };
         }
 
-        let kurirClean = kurir.replace('Reguler (Cashless)-', '').trim();
-        let variantBadge = variasi ? `<span style="display:inline-flex; align-items:center; gap:4px; margin-top:8px; padding: 4px 10px; background: #f0fdf4; color: #166534; font-size:12px; border-radius:var(--radius-sm); font-weight:600; border: 1px solid #bbf7d0;"><i class="ti ti-tag"></i> ${variasi}</span>` : '';
-        let catatanHtml = catatan ? `<div style="margin-top:10px; font-size:13px; color: #9a3412; background:#fff7ed; padding:10px 14px; border-radius:var(--radius-md); border: 1px solid #ffedd5;"><i class="ti ti-message-2" style="margin-right:4px;"></i> <b>Catatan:</b> ${catatan}</div>` : '';
+        const kurir = ordersMap[noPesanan].kurir;
+        if (kurir && kurir !== '-') {
+            let kClean = kurir.replace('Reguler (Cashless)-', '').trim();
+            kurirMap[kClean] = true;
+            ordersMap[noPesanan].kurir = kClean; 
+        }
 
-        rowsHtml += `
-            <tr data-kurir="${kurir}" style="background: transparent; transition: background 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
-                <td style="padding: 16px 20px; vertical-align: top; border-bottom: 1px solid var(--border-light);">
-                    <div style="font-weight:700; color:var(--text-primary); font-size:14px; letter-spacing:0.3px;">${noPesanan}</div>
-                    <div style="color:var(--text-tertiary); font-size:12px; margin-top:6px; font-family: monospace;"><i class="ti ti-barcode"></i> Resi: ${resi}</div>
-                </td>
-                <td style="padding: 16px 20px; vertical-align: top; border-bottom: 1px solid var(--border-light);">
-                    <span style="display:inline-flex; align-items:center; background:#f1f5f9; color:#334155; padding:6px 12px; border-radius:var(--radius-full); font-size:12px; font-weight:600; border: 1px solid #e2e8f0; line-height:1.2; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
-                        ${kurirClean}
-                    </span>
-                </td>
-                <td style="max-width:350px; white-space:normal; line-height:1.5; padding: 16px 20px; vertical-align: top; border-bottom: 1px solid var(--border-light);">
-                    <div style="font-size:14px; color:var(--text-primary); font-weight:500;">${produk}</div>
-                    <div style="display:flex; flex-wrap:wrap; gap:8px;">
-                        ${variantBadge}
-                    </div>
-                    ${catatanHtml}
-                </td>
-                <td style="text-align:center; padding: 16px 20px; vertical-align: top; border-bottom: 1px solid var(--border-light);">
-                    <div style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; background:var(--brand-primary); border-radius:8px; font-weight:700; color:#fff; font-size:16px; box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25);">
-                        ${jumlah}
-                    </div>
-                </td>
-                <td style="padding: 16px 20px; vertical-align: top; border-bottom: 1px solid var(--border-light); width: 250px;">
-                    <label style="cursor:pointer; display:inline-flex; align-items:center; gap:12px; padding: 10px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); transition: all 0.2s; width: 100%;">
-                        <input type="checkbox" onchange="togglePackedCheckbox(this)" style="width:22px; height:22px; cursor:pointer; accent-color: var(--brand-primary);">
-                        <span class="status-text" style="font-weight:600; color:#64748b; font-size:14px; letter-spacing:0.5px;">Belum Packing</span>
-                    </label>
-                </td>
-                <td style="padding: 16px 20px; vertical-align: top; border-bottom: 1px solid var(--border-light); width: 200px;">
-                    <button onclick="toggleProductStatus(this)" style="background:#fff7ed; color:#ea580c; border:1px solid #fed7aa; padding:8px 12px; border-radius:var(--radius-md); font-weight:600; font-size:12px; cursor:pointer; transition:all 0.2s; width:100px; display:flex; align-items:center; justify-content:center; gap:6px;">
-                        <i class="ti ti-loader"></i> Proses
-                    </button>
-                </td>
-            </tr>
-        `;
+        const jumlah = parseFloat(row[idxJumlah] || 0) || 0;
+        totalBarang += jumlah;
+
+        ordersMap[noPesanan].items.push({
+            produk: String(row[idxProduk] || '').trim(),
+            variasi: idxVariasi !== undefined ? String(row[idxVariasi] || '').trim() : '',
+            jumlah: jumlah,
+            catatan: idxCatatan !== undefined ? String(row[idxCatatan] || '').trim() : ''
+        });
     }
 
-    totalPesanan = uniqueOrders.size;
+    const totalPesanan = Object.keys(ordersMap).length;
+    const container = document.getElementById('packingListContainer');
+    if (!container) return; 
 
-    // Update Stats
-    document.getElementById('packingStatPesanan').innerText = totalPesanan.toLocaleString('id-ID');
-    document.getElementById('packingStatBarang').innerText = totalBarang.toLocaleString('id-ID');
+    let html = '';
+    
+    Object.values(ordersMap).forEach(order => {
+        let itemsHtml = '';
+        order.items.forEach((item, idx) => {
+            const isLast = idx === order.items.length - 1;
+            const variantBadge = item.variasi ? `<span style="display:inline-flex; align-items:center; gap:4px; margin-top:6px; padding: 4px 10px; background: #f1f5f9; color: #475569; font-size:11px; border-radius:4px; font-weight:600;"><i class="ti ti-tag"></i> ${item.variasi}</span>` : '';
+            const catatanHtml = item.catatan ? `<div style="margin-top:8px; font-size:12px; color: #9a3412; background:#fff7ed; padding:8px 12px; border-radius:6px; border: 1px solid #ffedd5;"><i class="ti ti-message-2" style="margin-right:4px;"></i> <b>Catatan:</b> ${item.catatan}</div>` : '';
+            
+            itemsHtml += `
+                <div style="display: flex; align-items: flex-start; justify-content: space-between; padding-bottom: ${isLast ? '0' : '12px'}; margin-bottom: ${isLast ? '0' : '12px'}; border-bottom: ${isLast ? 'none' : '1px dashed #e2e8f0'};">
+                    <div style="flex: 1; padding-right: 20px;">
+                        <div style="font-weight: 600; color: var(--text-primary); font-size: 13px; line-height: 1.4;">${item.produk}</div>
+                        <div style="display:flex; flex-wrap:wrap; gap:6px;">${variantBadge}</div>
+                        ${catatanHtml}
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <div style="font-size: 14px; font-weight: 700; color: var(--brand-primary); background: #ccfbf1; padding: 4px 12px; border-radius: 6px; border: 1px solid #99f6e4;">x${item.jumlah}</div>
+                    </div>
+                </div>
+            `;
+        });
 
-    // Update Filter Options
+        const statusBadge = order.status ? `<span style="background: #fef3c7; color: #b45309; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">${order.status}</span>` : '';
+
+        html += `
+            <div class="order-card" data-kurir="${order.kurir}" style="border: 1px solid var(--border-light); border-radius: var(--radius-lg); background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.02); overflow: hidden; transition: all 0.2s;">
+                <div style="background: #f8fafc; padding: 12px 16px; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                        <span style="font-weight: 800; color: var(--text-primary); font-size: 14px;">${order.noPesanan}</span>
+                        ${statusBadge}
+                        <span style="background: #e2e8f0; color: #334155; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;"><i class="ti ti-truck"></i> ${order.kurir}</span>
+                        <span style="color: #64748b; font-size: 12px; font-family: monospace; font-weight: 500;"><i class="ti ti-barcode"></i> Resi: ${order.resi}</span>
+                    </div>
+                    <div>
+                        <label style="cursor:pointer; display:inline-flex; align-items:center; gap:8px; padding: 6px 12px; background: #fff; border: 1px solid #cbd5e1; border-radius: 20px; transition: all 0.2s;">
+                            <input type="checkbox" onchange="togglePackedCheckbox(this)" style="width:16px; height:16px; accent-color: var(--brand-primary); cursor:pointer;">
+                            <span class="status-text" style="font-weight:700; color:#64748b; font-size:12px;">Belum Packing</span>
+                        </label>
+                    </div>
+                </div>
+                <div style="padding: 16px;">
+                    ${itemsHtml}
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+
+    if (document.getElementById('packingStatPesanan')) {
+        document.getElementById('packingStatPesanan').innerText = totalPesanan.toLocaleString('id-ID');
+    }
+    if (document.getElementById('packingStatBarang')) {
+        document.getElementById('packingStatBarang').innerText = totalBarang.toLocaleString('id-ID');
+    }
+
     const filterSelect = document.getElementById('packingKurirFilter');
     if (filterSelect) {
         let options = '<option value="all">Semua Ekspedisi</option>';
@@ -131,82 +143,43 @@ function updatePacking() {
         });
         filterSelect.innerHTML = options;
     }
-
-    if (tbody) tbody.innerHTML = rowsHtml;
 }
 
 function filterPackingByKurir() {
-    const selected = document.getElementById('packingKurirFilter').value;
-    const tbody = document.getElementById('packingTableBody');
-    if (!tbody) return;
-
-    const trs = tbody.querySelectorAll('tr');
-    trs.forEach(tr => {
-        if (selected === 'all' || tr.getAttribute('data-kurir') === selected) {
-            tr.style.display = '';
+    const val = document.getElementById('packingKurirFilter').value;
+    const cards = document.querySelectorAll('.order-card');
+    cards.forEach(card => {
+        if (val === 'all') {
+            card.style.display = 'block';
         } else {
-            tr.style.display = 'none';
+            const rowKurir = card.getAttribute('data-kurir') || '';
+            card.style.display = (rowKurir === val) ? 'block' : 'none';
         }
     });
 }
 
-function printSimpleLabel(noPesanan) {
-    const w = window.open("", "_blank", "width=800,height=600");
-    w.document.write(`
-        <html>
-        <head>
-            <title>Cetak Label Internal - ${noPesanan}</title>
-            <style>
-                body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
-                .label { border: 2px dashed #334155; padding: 20px; max-width: 400px; margin: 0 auto; text-align: center; border-radius: 8px; }
-                h1 { margin-top: 0; font-size: 24px; color: #0f172a; }
-                .resi { font-size: 24px; font-weight: bold; background: #f1f5f9; padding: 10px; margin: 20px 0; border: 1px solid #cbd5e1; border-radius: 4px; }
-                .print-btn { padding: 12px 24px; background: #0f172a; color: #fff; border: none; border-radius: 6px; cursor: pointer; margin-bottom: 20px; font-weight: bold; font-size: 16px; }
-                @media print { .print-btn { display: none; } .label { border: 2px solid #000; border-radius: 0; } }
-            </style>
-        </head>
-        <body>
-            <button class="print-btn" onclick="window.print()">Print Label Ini</button>
-            <div class="label">
-                <h1>LABEL INTERNAL</h1>
-                <p style="color:#64748b; font-size:14px;">Nomor Pesanan / Resi:</p>
-                <div class="resi">${noPesanan}</div>
-                <p style="color: #ef4444; font-size: 12px; font-weight: bold;">(KHUSUS GUDANG - JANGAN DITEMPEL DI PAKET LUAR)</p>
-            </div>
-        </body>
-        </html>
-    `);
-    w.document.close();
-}
-
-function togglePackedCheckbox(cb) {
-    const tr = cb.closest('tr');
-    const span = tr.querySelector('.status-text');
-    if (cb.checked) {
-        tr.classList.add('packed-row');
-        tr.style.opacity = '0.5';
-        tr.style.background = '#f0fdf4';
-        span.innerText = 'SUDAH PACKING';
-        span.style.color = '#166534';
+function togglePackedCheckbox(checkbox) {
+    const label = checkbox.closest('label');
+    const textSpan = label.querySelector('.status-text');
+    const card = checkbox.closest('.order-card');
+    
+    if (checkbox.checked) {
+        label.style.background = '#ecfdf5';
+        label.style.borderColor = '#6ee7b7';
+        textSpan.style.color = '#059669';
+        textSpan.innerText = 'Selesai Packing';
+        if(card) {
+            card.style.opacity = '0.6';
+            card.style.transform = 'scale(0.99)';
+        }
     } else {
-        tr.classList.remove('packed-row');
-        tr.style.opacity = '1';
-        tr.style.background = 'transparent';
-        span.innerText = 'Belum Packing';
-        span.style.color = '#64748b';
+        label.style.background = '#fff';
+        label.style.borderColor = '#cbd5e1';
+        textSpan.style.color = '#64748b';
+        textSpan.innerText = 'Belum Packing';
+        if(card) {
+            card.style.opacity = '1';
+            card.style.transform = 'scale(1)';
+        }
     }
 }
-function toggleProductStatus(btn) {
-    if (btn.innerText.includes('Proses')) {
-        btn.innerHTML = '<i class="ti ti-check"></i> Selesai';
-        btn.style.background = '#dcfce7';
-        btn.style.color = '#166534';
-        btn.style.border = '1px solid #bbf7d0';
-    } else {
-        btn.innerHTML = '<i class="ti ti-loader"></i> Proses';
-        btn.style.background = '#fff7ed';
-        btn.style.color = '#ea580c';
-        btn.style.border = '1px solid #fed7aa';
-    }
-}
-
