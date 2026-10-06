@@ -356,19 +356,19 @@
                         <div class="stats-grid" style="grid-template-columns: 1fr; margin-bottom: var(--space-4);">
                             <div class="stat-card" style="display:flex; justify-content:space-between; align-items:center;">
                                 <div>
-                                    <div class="stat-title" title="Persentase margin keuntungan setelah dipotong modal & admin (sebelum iklan)">Keuntungan Kotor (%) <i class="ti ti-info-circle" style="color: var(--text-tertiary); font-size: 14px; cursor: help;"></i></div>
+                                    <div class="stat-title" style="cursor:pointer;" onclick="showToast('Persentase margin keuntungan setelah dipotong modal & admin (sebelum dipotong biaya iklan).', 'info')">Keuntungan Kotor (%) <i class="ti ti-info-circle" style="color: var(--brand-primary); font-size: 14px;"></i></div>
                                     <div class="stat-value" id="simGrossMargin">0%</div>
                                 </div>
                             </div>
                             <div class="stat-card" style="display:flex; justify-content:space-between; align-items:center;">
                                 <div>
-                                    <div class="stat-title" title="Batas ROAS paling minimal agar iklan tidak rugi/boncos (Titik Impas)">Batas Minimum ROAS <i class="ti ti-info-circle" style="color: var(--text-tertiary); font-size: 14px; cursor: help;"></i></div>
+                                    <div class="stat-title" style="cursor:pointer;" onclick="showToast('Batas ROAS paling minimal agar Anda tidak rugi/boncos (Titik Impas).', 'info')">Batas Minimum ROAS <i class="ti ti-info-circle" style="color: var(--brand-primary); font-size: 14px;"></i></div>
                                     <div class="stat-value" id="simBreakevenRoi" style="color: var(--brand-primary);">0.0</div>
                                 </div>
                             </div>
                             <div class="stat-card" style="display:flex; justify-content:space-between; align-items:center;">
                                 <div>
-                                    <div class="stat-title" title="Sisa uang masuk kantong per produk setelah potong modal, admin, dan iklan">Keuntungan Bersih (Per Produk) <i class="ti ti-info-circle" style="color: var(--text-tertiary); font-size: 14px; cursor: help;"></i></div>
+                                    <div class="stat-title" style="cursor:pointer;" onclick="showToast('Sisa uang bersih masuk kantong (per produk) setelah dipotong modal, admin, dan biaya iklan.', 'info')">Keuntungan Bersih (Per Produk) <i class="ti ti-info-circle" style="color: var(--brand-primary); font-size: 14px;"></i></div>
                                     <div class="stat-value" id="simNetProfit">Rp 0</div>
                                 </div>
                             </div>
@@ -377,7 +377,7 @@
                         <!-- Burn Rate Indicator -->
                         <div class="card" style="border: 1px solid var(--border-light); box-shadow:none;">
                             <div class="card-body">
-                                <div style="font-weight: 600; margin-bottom: 8px;" title="Simulasi berapa banyak barang yang harus terjual sebelum budget iklan harian Anda habis">Simulasi Target & Ketahanan Budget Iklan <i class="ti ti-info-circle" style="color: var(--text-tertiary); font-size: 14px; cursor: help;"></i></div>
+                                <div style="font-weight: 600; margin-bottom: 8px; cursor:pointer;" onclick="showToast('Simulasi berapa banyak barang yang harus laku sebelum budget iklan harian Anda habis.', 'info')">Simulasi Target & Ketahanan Budget Iklan <i class="ti ti-info-circle" style="color: var(--brand-primary); font-size: 14px;"></i></div>
                                 <div id="simBurnRateAlert" style="padding: 16px; border-radius: var(--radius-md); background: var(--bg-tertiary); color: var(--text-secondary); font-size: 14px; line-height: 1.5;">
                                     Silakan isi data di sebelah kiri untuk melihat simulasi strategi iklan Anda.
                                 </div>
