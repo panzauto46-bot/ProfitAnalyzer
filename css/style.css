@@ -1404,6 +1404,7 @@
 
 .btn {
     padding: 10px 20px;
+    line-height: 1.2;
     font-size: 14px;
     font-weight: 600;
     font-family: var(--font);
