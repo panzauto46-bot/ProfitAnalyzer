@@ -1,4 +1,4 @@
-﻿function updatePacking() {
+function updatePacking() {
     if (!rawRows || rawRows.length === 0) return;
 
     const headers = rawHeaders || rawRows[0] || [];
@@ -195,7 +195,7 @@ function switchOrderTab(tabName) {
     document.getElementById('orderListTitle').innerHTML = '<i class="ti ti-list"></i> Daftar Pesanan: ' + tabName;
     
     // Reset all tabs UI
-    const tabs = ['Semua', 'Perlu Dikirim', 'Dikirim', 'Selesai'];
+    const tabs = ['Dashboard', 'Semua', 'Perlu Dikirim', 'Dikirim', 'Selesai'];
     tabs.forEach(t => {
         const elId = 'tab-' + t.replace(' ', '-');
         const el = document.getElementById(elId);
@@ -217,3 +217,4 @@ function switchOrderTab(tabName) {
     // For now, if we already have data loaded, just re-render the table with filtering (to be implemented)
     // filterPackingTable();
 }
+
