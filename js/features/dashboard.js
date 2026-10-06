@@ -36,25 +36,25 @@ function renderDashboard(container) {
                 <div style="background: white; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
                     <h3 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; display:flex; align-items:center; gap:8px;"><i class="ti ti-chart-pie" style="color:var(--brand-primary);"></i> Komposisi Status Pesanan</h3>
                     
-                    <div style="display: flex; align-items: center; justify-content: space-between; height: 260px;">
-                        <div style="flex: 1; position: relative; height: 100%;">
+                    <div style="display: flex; align-items: center; justify-content: flex-start; height: 260px; gap: 40px; padding-left: 10px;">
+                        <div style="width: 220px; height: 220px; position: relative; flex-shrink: 0;">
                             <canvas id="packingStatusChart"></canvas>
                         </div>
-                        <div style="width: 160px; display: flex; flex-direction: column; gap: 16px; padding-left: 20px;">
-                            <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text-secondary); font-weight:600;">
-                                <div style="width:16px; height:16px; border-radius:4px; background:#f97316;"></div>
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 18px;">
+                            <div style="display:flex; align-items:center; gap:12px; font-size:15px; color:var(--text-primary); font-weight:700;">
+                                <div style="width:24px; height:24px; border-radius:6px; background:#f97316;"></div>
                                 Perlu Dikirim (${pctP}%)
                             </div>
-                            <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text-secondary); font-weight:600;">
-                                <div style="width:16px; height:16px; border-radius:4px; background:#3b82f6;"></div>
+                            <div style="display:flex; align-items:center; gap:12px; font-size:15px; color:var(--text-primary); font-weight:700;">
+                                <div style="width:24px; height:24px; border-radius:6px; background:#3b82f6;"></div>
                                 Dikirim (${pctD}%)
                             </div>
-                            <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text-secondary); font-weight:600;">
-                                <div style="width:16px; height:16px; border-radius:4px; background:#22c55e;"></div>
+                            <div style="display:flex; align-items:center; gap:12px; font-size:15px; color:var(--text-primary); font-weight:700;">
+                                <div style="width:24px; height:24px; border-radius:6px; background:#22c55e;"></div>
                                 Selesai (${pctS}%)
                             </div>
-                            <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text-secondary); font-weight:600;">
-                                <div style="width:16px; height:16px; border-radius:4px; background:#ef4444;"></div>
+                            <div style="display:flex; align-items:center; gap:12px; font-size:15px; color:var(--text-primary); font-weight:700;">
+                                <div style="width:24px; height:24px; border-radius:6px; background:#ef4444;"></div>
                                 Dibatalkan (${pctB}%)
                             </div>
                         </div>
@@ -122,4 +122,6 @@ function renderDashboard(container) {
     if (statPesanan) statPesanan.innerText = window.ordersStats.total.toLocaleString('id-ID');
     if (statBarang) statBarang.innerText = window.ordersStats.qty.toLocaleString('id-ID');
 }
+
+
 
