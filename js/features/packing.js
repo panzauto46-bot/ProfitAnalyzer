@@ -191,4 +191,3 @@ function togglePackedCheckbox(cb) {
         span.style.color = '#64748b';
     }
 }
-}
