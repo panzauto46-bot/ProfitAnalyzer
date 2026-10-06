@@ -102,7 +102,7 @@ function updatePacking() {
                     </div>
                 </td>
                 <td style="text-align:center; padding: 16px 20px; vertical-align: top; border-bottom: 1px solid var(--border-light);">
-                    <button onclick="togglePacked(this)" style="background:var(--brand-light); color:var(--brand-primary); border:none; padding:8px 12px; border-radius:var(--radius-md); font-weight:600; font-size:12px; cursor:pointer; transition:all 0.2s;"><i class="ti ti-check"></i> Selesai</button>
+                    <button onclick="togglePacked(this)" style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; padding:8px 12px; border-radius:var(--radius-md); font-weight:600; font-size:12px; cursor:pointer; transition:all 0.2s;"><i class="ti ti-box"></i> Packing</button>
                 </td>
             </tr>
         `;
@@ -177,15 +177,18 @@ function togglePacked(btn) {
         tr.classList.remove('packed-row');
         tr.style.opacity = '1';
         tr.style.background = 'transparent';
-        btn.innerHTML = '<i class="ti ti-check"></i> Selesai';
-        btn.style.background = 'var(--brand-light)';
-        btn.style.color = 'var(--brand-primary)';
+        btn.innerHTML = '<i class="ti ti-box"></i> Packing';
+        btn.style.background = '#f1f5f9';
+        btn.style.color = '#475569';
+        btn.style.border = '1px solid #cbd5e1';
     } else {
         tr.classList.add('packed-row');
         tr.style.opacity = '0.5';
         tr.style.background = '#f0fdf4';
-        btn.innerHTML = '<i class="ti ti-x"></i> Batal';
-        btn.style.background = '#fee2e2';
-        btn.style.color = '#ef4444';
+        btn.innerHTML = '<i class="ti ti-check"></i> Selesai';
+        btn.style.background = '#dcfce7';
+        btn.style.color = '#166534';
+        btn.style.border = '1px solid #bbf7d0';
     }
+}
 }
