@@ -232,6 +232,7 @@ function renderKeuanganData(rows) {
     
         // Detect money column intelligently
     let moneyCol = findMoneyCol(rows);
+    const headers = Object.keys(rows[0]);
     
     let total = 0;
     if (moneyCol) {
