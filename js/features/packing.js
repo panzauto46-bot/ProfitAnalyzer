@@ -52,7 +52,7 @@ function updatePacking() {
     // Keep track of unique orders to count properly
     const uniqueOrders = new Set();
 
-    for (let i = 0; i < rawRows.length; i++) {
+        for (let i = 0; i < rawRows.length; i++) {
         const row = rawRows[i];
         if (!row || row.length === 0) continue;
 
@@ -74,25 +74,32 @@ function updatePacking() {
             kurirMap[kurir] = true;
         }
 
-        let variantBadge = variasi ? `<span style="display:inline-block; margin-top:4px; padding: 2px 6px; background:var(--brand-light); color:var(--brand-primary); font-size:11px; border-radius:4px; font-weight:600;">${variasi}</span>` : '';
-        let catatanHtml = catatan ? `<div style="margin-top:6px; font-size:11px; color:var(--warning); background:#fffbeb; padding:4px 8px; border-radius:4px; border-left:2px solid var(--warning);"><i class="ti ti-message-2"></i> ${catatan}</div>` : '';
+        let kurirClean = kurir.replace('Reguler (Cashless)-', '').trim();
+        let variantBadge = variasi ? `<span style="display:inline-flex; align-items:center; gap:4px; margin-top:8px; padding: 4px 10px; background: #f0fdf4; color: #166534; font-size:12px; border-radius:var(--radius-sm); font-weight:600; border: 1px solid #bbf7d0;"><i class="ti ti-tag"></i> ${variasi}</span>` : '';
+        let catatanHtml = catatan ? `<div style="margin-top:10px; font-size:13px; color: #9a3412; background:#fff7ed; padding:10px 14px; border-radius:var(--radius-md); border: 1px solid #ffedd5;"><i class="ti ti-message-2" style="margin-right:4px;"></i> <b>Catatan:</b> ${catatan}</div>` : '';
 
         rowsHtml += `
-            <tr data-kurir="${kurir}">
-                <td>
-                    <div style="font-weight:600; color:var(--text-primary); font-size:13px;">${noPesanan}</div>
-                    <div style="color:var(--text-tertiary); font-size:11px; margin-top:2px;">Resi: ${resi}</div>
+            <tr data-kurir="${kurir}" style="background: transparent; transition: background 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+                <td style="padding: 16px 20px; vertical-align: top; border-bottom: 1px solid var(--border-light);">
+                    <div style="font-weight:700; color:var(--text-primary); font-size:14px; letter-spacing:0.3px;">${noPesanan}</div>
+                    <div style="color:var(--text-tertiary); font-size:12px; margin-top:6px; font-family: monospace;"><i class="ti ti-barcode"></i> Resi: ${resi}</div>
                 </td>
-                <td>
-                    <span style="font-weight:500; color:var(--text-secondary); font-size:12px;">${kurir}</span>
+                <td style="padding: 16px 20px; vertical-align: top; border-bottom: 1px solid var(--border-light);">
+                    <span style="display:inline-flex; align-items:center; background:#f1f5f9; color:#334155; padding:6px 12px; border-radius:var(--radius-full); font-size:12px; font-weight:600; border: 1px solid #e2e8f0; line-height:1.2; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                        ${kurirClean}
+                    </span>
                 </td>
-                <td style="max-width:300px; white-space:normal; line-height:1.4;">
-                    <div style="font-size:13px; color:var(--text-secondary);">${produk}</div>
-                    ${variantBadge}
+                <td style="max-width:350px; white-space:normal; line-height:1.5; padding: 16px 20px; vertical-align: top; border-bottom: 1px solid var(--border-light);">
+                    <div style="font-size:14px; color:var(--text-primary); font-weight:500;">${produk}</div>
+                    <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                        ${variantBadge}
+                    </div>
                     ${catatanHtml}
                 </td>
-                <td style="text-align:center;">
-                    <span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; background:var(--bg-secondary); border-radius:50%; font-weight:700; color:var(--text-primary); font-size:14px;">${jumlah}</span>
+                <td style="text-align:center; padding: 16px 20px; vertical-align: top; border-bottom: 1px solid var(--border-light);">
+                    <div style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; background:var(--brand-primary); border-radius:8px; font-weight:700; color:#fff; font-size:16px; box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25);">
+                        ${jumlah}
+                    </div>
                 </td>
             </tr>
         `;
