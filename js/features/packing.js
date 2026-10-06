@@ -47,115 +47,65 @@ function updatePacking() {
     let kurirMap = {}; // for filter options
 
     const tbody = document.getElementById('packingTableBody');
+    let rowsHtml = '';
+    
     // Keep track of unique orders to count properly
-        const idxUsername = hMap["username (pembeli)"] || hMap["username"];
-    const idxTotalPay = hMap["total pembayaran"];
-    const idxPaymentMethod = hMap["metode pembayaran"];
-    const idxStatus = hMap["status pesanan"];
-
-    let cardsHtml = "";
-    const ordersMap = {};
     const uniqueOrders = new Set();
 
-    for (let i = 0; i < rawRows.length; i++) {
+        for (let i = 0; i < rawRows.length; i++) {
         const row = rawRows[i];
         if (!row || row.length === 0) continue;
 
-        const noPesanan = String(row[idxNoPesanan] || "").trim();
+        const noPesanan = String(row[idxNoPesanan] || '').trim();
         if (!noPesanan) continue;
 
         uniqueOrders.add(noPesanan);
-        
+
+        const resi = idxResi !== undefined ? String(row[idxResi] || '').trim() : '-';
+        const kurir = idxKurir !== undefined ? String(row[idxKurir] || '').trim() : '-';
+        const produk = String(row[idxProduk] || '').trim();
+        const variasi = idxVariasi !== undefined ? String(row[idxVariasi] || '').trim() : '';
         const jumlah = parseFloat(row[idxJumlah] || 0) || 0;
+        const catatan = idxCatatan !== undefined ? String(row[idxCatatan] || '').trim() : '';
+
         totalBarang += jumlah;
-
-        if (!ordersMap[noPesanan]) {
-            const kurir = idxKurir !== undefined ? String(row[idxKurir] || "").trim() : "-";
-            if (kurir && kurir !== "-") kurirMap[kurir] = true;
-
-            ordersMap[noPesanan] = {
-                noPesanan: noPesanan,
-                username: idxUsername !== undefined ? String(row[idxUsername] || "").trim() : "Pembeli",
-                kurir: kurir,
-                resi: idxResi !== undefined ? String(row[idxResi] || "").trim() : "-",
-                totalPay: idxTotalPay !== undefined ? String(row[idxTotalPay] || "").trim() : "0",
-                paymentMethod: idxPaymentMethod !== undefined ? String(row[idxPaymentMethod] || "").trim() : "-",
-                status: idxStatus !== undefined ? String(row[idxStatus] || "").trim() : "Perlu Dikirim",
-                catatan: idxCatatan !== undefined ? String(row[idxCatatan] || "").trim() : "",
-                products: []
-            };
+        
+        if (kurir && kurir !== '-') {
+            kurirMap[kurir] = true;
         }
-        
-        ordersMap[noPesanan].products.push({
-            nama: String(row[idxProduk] || "").trim(),
-            variasi: idxVariasi !== undefined ? String(row[idxVariasi] || "").trim() : "",
-            jumlah: jumlah
-        });
-    }
-    
-    for (const orderNo in ordersMap) {
-        const order = ordersMap[orderNo];
-        
-        let productsHtml = "";
-        order.products.forEach(p => {
-            let varHtml = p.variasi ? `<div style="color:var(--text-tertiary); font-size:12px; margin-top:4px;">Variasi: ${p.variasi}</div>` : "";
-            productsHtml += `
-                <div style="display:flex; gap:12px; margin-bottom: 12px; align-items:flex-start;">
-                    <div style="width:50px; height:50px; background:#f1f5f9; border-radius:4px; display:flex; align-items:center; justify-content:center; flex-shrink:0; color:#cbd5e1;"><i class="ti ti-photo" style="font-size:24px;"></i></div>
-                    <div>
-                        <div style="font-size:13px; color:var(--text-primary); font-weight:500; line-height:1.4;">${p.nama} <span style="color:var(--brand-primary); font-weight:700;">x${p.jumlah}</span></div>
-                        ${varHtml}
-                    </div>
-                </div>
-            `;
-        });
-        
-        let catatanHtml = order.catatan ? `<div style="background:#f8fafc; border-top:1px solid #f1f5f9; padding:12px 16px; font-size:13px; color:var(--text-secondary);"><span style="color:var(--brand-primary); font-weight:600;">Pesan:</span> ${order.catatan}</div>` : "";
-        
-        let kurirSplit = order.kurir.split("-");
-        let kurirTipe = kurirSplit[0] ? kurirSplit[0].trim() : "";
-        let kurirNama = kurirSplit[1] ? kurirSplit[1].trim() : order.kurir;
 
-        cardsHtml += `
-            <div class="order-card" data-kurir="${order.kurir}" style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-lg); margin-bottom:16px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
-                <div style="background:#f8fafc; padding:12px 16px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-light);">
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <div style="width:24px; height:24px; background:#e2e8f0; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#64748b;"><i class="ti ti-user" style="font-size:14px;"></i></div>
-                        <span style="font-weight:600; font-size:13px; color:var(--text-primary);">${order.username}</span>
-                        <i class="ti ti-message-circle-2" style="color:var(--brand-primary); font-size:16px; margin-left:4px;"></i>
+        let kurirClean = kurir.replace('Reguler (Cashless)-', '').trim();
+        let variantBadge = variasi ? `<span style="display:inline-flex; align-items:center; gap:4px; margin-top:8px; padding: 4px 10px; background: #f0fdf4; color: #166534; font-size:12px; border-radius:var(--radius-sm); font-weight:600; border: 1px solid #bbf7d0;"><i class="ti ti-tag"></i> ${variasi}</span>` : '';
+        let catatanHtml = catatan ? `<div style="margin-top:10px; font-size:13px; color: #9a3412; background:#fff7ed; padding:10px 14px; border-radius:var(--radius-md); border: 1px solid #ffedd5;"><i class="ti ti-message-2" style="margin-right:4px;"></i> <b>Catatan:</b> ${catatan}</div>` : '';
+
+        rowsHtml += `
+            <tr data-kurir="${kurir}" style="background: transparent; transition: background 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+                <td style="padding: 16px 20px; vertical-align: top; border-bottom: 1px solid var(--border-light);">
+                    <div style="font-weight:700; color:var(--text-primary); font-size:14px; letter-spacing:0.3px;">${noPesanan}</div>
+                    <div style="color:var(--text-tertiary); font-size:12px; margin-top:6px; font-family: monospace;"><i class="ti ti-barcode"></i> Resi: ${resi}</div>
+                </td>
+                <td style="padding: 16px 20px; vertical-align: top; border-bottom: 1px solid var(--border-light);">
+                    <span style="display:inline-flex; align-items:center; background:#f1f5f9; color:#334155; padding:6px 12px; border-radius:var(--radius-full); font-size:12px; font-weight:600; border: 1px solid #e2e8f0; line-height:1.2; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                        ${kurirClean}
+                    </span>
+                </td>
+                <td style="max-width:350px; white-space:normal; line-height:1.5; padding: 16px 20px; vertical-align: top; border-bottom: 1px solid var(--border-light);">
+                    <div style="font-size:14px; color:var(--text-primary); font-weight:500;">${produk}</div>
+                    <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                        ${variantBadge}
                     </div>
-                    <div style="font-size:13px; color:var(--text-secondary);">No. Pesanan <span style="font-weight:600; color:var(--text-primary);">${order.noPesanan}</span></div>
-                </div>
-                
-                <div style="padding:16px; display:grid; grid-template-columns: minmax(200px, 2fr) minmax(100px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr) 120px; gap:16px; align-items:start;">
-                    <div>${productsHtml}</div>
-                    <div>
-                        <div style="font-weight:600; color:var(--text-primary); font-size:13px;">Rp${order.totalPay}</div>
-                        <div style="color:var(--text-tertiary); font-size:12px; margin-top:4px;">${order.paymentMethod}</div>
+                    ${catatanHtml}
+                </td>
+                <td style="text-align:center; padding: 16px 20px; vertical-align: top; border-bottom: 1px solid var(--border-light);">
+                    <div style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; background:var(--brand-primary); border-radius:8px; font-weight:700; color:#fff; font-size:16px; box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25);">
+                        ${jumlah}
                     </div>
-                    <div>
-                        <div style="font-weight:600; color:var(--text-primary); font-size:13px;">${order.status}</div>
-                        <div style="color:var(--text-tertiary); font-size:11px; margin-top:4px; line-height:1.4;">Menunggu pengiriman diverifikasi oleh Jasa Kirim.</div>
-                    </div>
-                    <div>
-                        <div style="color:var(--text-primary); font-size:13px; font-weight:500;">${kurirTipe}</div>
-                        <div style="color:var(--text-secondary); font-size:12px; margin-top:4px;">${kurirNama}</div>
-                        <div style="color:var(--text-tertiary); font-size:12px; margin-top:2px;">Drop off</div>
-                        <div style="color:var(--text-tertiary); font-size:12px; margin-top:2px; font-family:monospace;">${order.resi}</div>
-                    </div>
-                    <div style="text-align:right;">
-                        <a href="#" onclick="alert('Fitur rincian dalam pengembangan'); return false;" style="display:block; color:var(--brand-primary); text-decoration:none; font-size:13px; margin-bottom:8px; font-weight:500;">Lihat Rincian Pengiriman</a>
-                        <a href="#" onclick="window.print(); return false;" style="display:block; color:var(--brand-primary); text-decoration:none; font-size:13px; font-weight:500;">Cetak Label (Internal)</a>
-                    </div>
-                </div>
-                
-                ${catatanHtml}
-            </div>
+                </td>
+            </tr>
         `;
     }
-    
+
     totalPesanan = uniqueOrders.size;
-totalPesanan = uniqueOrders.size;
 
     // Update Stats
     document.getElementById('packingStatPesanan').innerText = totalPesanan.toLocaleString('id-ID');
@@ -171,7 +121,7 @@ totalPesanan = uniqueOrders.size;
         filterSelect.innerHTML = options;
     }
 
-    if (tbody) tbody.innerHTML = cardsHtml;
+    if (tbody) tbody.innerHTML = rowsHtml;
 }
 
 function filterPackingByKurir() {
@@ -208,7 +158,7 @@ function printSimpleLabel(noPesanan) {
             <button class="print-btn" onclick="window.print()">Print Label Ini</button>
             <div class="label">
                 <h1>LABEL INTERNAL</h1>
-                <p style="color:#64748b; font-size:14px;">Nomor Pesanan:</p>
+                <p style="color:#64748b; font-size:14px;">Nomor Pesanan / Resi:</p>
                 <div class="resi">${noPesanan}</div>
                 <p style="color: #ef4444; font-size: 12px; font-weight: bold;">(KHUSUS GUDANG - JANGAN DITEMPEL DI PAKET LUAR)</p>
             </div>
@@ -217,4 +167,3 @@ function printSimpleLabel(noPesanan) {
     `);
     w.document.close();
 }
-
