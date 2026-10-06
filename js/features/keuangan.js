@@ -165,13 +165,22 @@ function updateKeuanganDashboard() {
 function findMoneyCol(rows) {
     if (!rows || rows.length === 0) return null;
     const headers = Object.keys(rows[0]);
-    for (let h of headers) {
+    
+    const isExcludedCol = (h) => {
         let hl = h.toLowerCase();
-        if (!hl.includes('waktu') && !hl.includes('tanggal') && !hl.includes('date') && !hl.includes('time')) {
-            if (hl.includes('jumlah') || hl.includes('nominal') || hl.includes('total') || hl.includes('pelepasan') || hl.includes('dana') || hl.includes('amount') || hl.includes('pembayaran') || hl.includes('penghasilan')) {
+        return hl.includes('waktu') || hl.includes('tanggal') || hl.includes('date') || hl.includes('time') || 
+               hl.match(/\bid\b/) || hl.includes('id ') || hl.includes('no.') || hl.includes('nomor') || hl.includes('pesanan') || hl.includes('resi');
+    };
+
+    for (let h of headers) {
+        if (!isExcludedCol(h)) {
+            let hl = h.toLowerCase();
+            if (hl.includes('jumlah') || hl.includes('nominal') || hl.includes('total') || hl.includes('pelepasan') || hl.includes('dana') || hl.includes('amount') || hl.includes('pembayaran') || hl.includes('penghasilan') || hl.includes('subtotal')) {
                 let isNumeric = false;
                 for(let i=0; i<Math.min(5, rows.length); i++) {
-                    if (typeof rows[i][h] === 'number' || !isNaN(parseFloat(String(rows[i][h]).replace(/[^0-9.-]/g, '')))) {
+                    let val = rows[i][h];
+                    if (val === "" || val === null || val === undefined) continue;
+                    if (typeof val === 'number' || !isNaN(parseFloat(String(val).replace(/[^0-9.-]/g, '')))) {
                         isNumeric = true; break;
                     }
                 }
@@ -180,8 +189,10 @@ function findMoneyCol(rows) {
         }
     }
     for (let h of headers) {
-        for(let i=0; i<Math.min(5, rows.length); i++) {
-            if (typeof rows[i][h] === 'number') return h;
+        if (!isExcludedCol(h)) {
+            for(let i=0; i<Math.min(5, rows.length); i++) {
+                if (typeof rows[i][h] === 'number') return h;
+            }
         }
     }
     return null;
@@ -219,42 +230,8 @@ function renderKeuanganData(rows) {
     document.getElementById('keuanganResults').style.display = 'block';
     document.getElementById('keuanganRowCount').innerText = rows.length;
     
-    // Detect money column intelligently
-    let moneyCol = null;
-    const headers = Object.keys(rows[0]);
-    
-    for (let h of headers) {
-        let hl = h.toLowerCase();
-        if (!hl.includes('waktu') && !hl.includes('tanggal') && !hl.includes('date') && !hl.includes('time')) {
-            if (hl.includes('jumlah') || hl.includes('nominal') || hl.includes('total') || hl.includes('pelepasan') || hl.includes('dana') || hl.includes('amount') || hl.includes('pembayaran') || hl.includes('penghasilan')) {
-                // verify if values are mostly numeric
-                let isNumeric = false;
-                for(let i=0; i<Math.min(5, rows.length); i++) {
-                    if (typeof rows[i][h] === 'number' || !isNaN(parseFloat(String(rows[i][h]).replace(/[^0-9.-]/g, '')))) {
-                        isNumeric = true;
-                        break;
-                    }
-                }
-                if (isNumeric) {
-                    moneyCol = h;
-                    break;
-                }
-            }
-        }
-    }
-    
-    // Fallback if no specific name matches: find the first numeric column
-    if (!moneyCol) {
-        for (let h of headers) {
-            for(let i=0; i<Math.min(5, rows.length); i++) {
-                if (typeof rows[i][h] === 'number') {
-                    moneyCol = h;
-                    break;
-                }
-            }
-            if (moneyCol) break;
-        }
-    }
+        // Detect money column intelligently
+    let moneyCol = findMoneyCol(rows);
     
     let total = 0;
     if (moneyCol) {
