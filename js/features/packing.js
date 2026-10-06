@@ -6,7 +6,7 @@ function updatePacking() {
     // "No. Pesanan", "No. Resi", "Opsi Pengiriman", "Nama Produk"
     
     // First, find header index map
-    const headers = window.rawRows[0] || [];
+    const headers = window.rawHeaders || window.rawRows[0] || [];
     const hMap = {};
     for (let i = 0; i < headers.length; i++) {
         const val = String(headers[i] || '').trim().toLowerCase();
@@ -52,7 +52,7 @@ function updatePacking() {
     // Keep track of unique orders to count properly
     const uniqueOrders = new Set();
 
-    for (let i = 1; i < window.rawRows.length; i++) {
+    for (let i = 0; i < window.rawRows.length; i++) {
         const row = window.rawRows[i];
         if (!row || row.length === 0) continue;
 
