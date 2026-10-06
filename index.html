@@ -520,8 +520,8 @@
             
             <div id="packingEmptyState" class="empty-state">
                 <div class="empty-state-icon"><i class="ti ti-box"></i></div>
-                <h3>Belum ada file pesanan (Order to Ship)</h3>
-                <p>Upload file "Pesanan Perlu Dikirim" dari Shopee/TikTok untuk mulai.</p>
+                <h3>Sistem Manajemen Pesanan Kosong</h3>
+                <p>Upload file "Pesanan Perlu Dikirim", "Dikirim", "Selesai", atau "Semua" untuk melacak status pesanan.</p>
                 <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()" style="margin-top: 16px; border-radius: var(--radius-full); width: auto; padding: 12px 32px; margin-left: auto; margin-right: auto;"><i class="ti ti-upload"></i> Pilih File Pesanan</button>
             </div>
 
@@ -557,9 +557,26 @@
                     </div>
                 </div>
 
+                
+                <!-- Order Status Tabs (NEW UI) -->
+                <div class="order-tabs" style="display: flex; gap: 32px; border-bottom: 2px solid var(--border-light); margin-bottom: 24px; padding-left: 8px; overflow-x: auto; white-space: nowrap;">
+                    <div class="order-tab active" onclick="switchOrderTab('Semua')" id="tab-Semua" style="padding-bottom: 12px; font-weight: 600; color: var(--brand-primary); border-bottom: 3px solid var(--brand-primary); cursor: pointer; transition: all 0.2s;">
+                        Semua
+                    </div>
+                    <div class="order-tab" onclick="switchOrderTab('Perlu Dikirim')" id="tab-Perlu-Dikirim" style="padding-bottom: 12px; font-weight: 600; color: var(--text-secondary); border-bottom: 3px solid transparent; cursor: pointer; transition: all 0.2s;">
+                        Perlu Dikirim <span id="count-perlu-dikirim" style="background:#e2e8f0; color:#475569; padding:2px 8px; border-radius:12px; font-size:12px; margin-left:4px;">0</span>
+                    </div>
+                    <div class="order-tab" onclick="switchOrderTab('Dikirim')" id="tab-Dikirim" style="padding-bottom: 12px; font-weight: 600; color: var(--text-secondary); border-bottom: 3px solid transparent; cursor: pointer; transition: all 0.2s;">
+                        Dikirim <span id="count-dikirim" style="background:#e2e8f0; color:#475569; padding:2px 8px; border-radius:12px; font-size:12px; margin-left:4px;">0</span>
+                    </div>
+                    <div class="order-tab" onclick="switchOrderTab('Selesai')" id="tab-Selesai" style="padding-bottom: 12px; font-weight: 600; color: var(--text-secondary); border-bottom: 3px solid transparent; cursor: pointer; transition: all 0.2s;">
+                        Selesai <span id="count-selesai" style="background:#e2e8f0; color:#475569; padding:2px 8px; border-radius:12px; font-size:12px; margin-left:4px;">0</span>
+                    </div>
+                </div>
+
                 <div class="card">
-                    <div class="card-header">
-                        <span class="card-header-title"><i class="ti ti-list"></i> Daftar Pesanan &amp; Pengiriman</span>
+                      <div class="card-header">
+                          <span class="card-header-title" id="orderListTitle"><i class="ti ti-list"></i> Daftar Pesanan: Semua</span>
                     </div>
                     <div class="card-body" style="padding:0;">
                         <div id="packingListContainer" style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">

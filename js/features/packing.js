@@ -183,3 +183,37 @@ function togglePackedCheckbox(checkbox) {
         }
     }
 }
+
+
+// --- TAB NAVIGATION UI ---
+window.currentOrderTab = 'Semua';
+
+function switchOrderTab(tabName) {
+    window.currentOrderTab = tabName;
+    
+    // Update Title
+    document.getElementById('orderListTitle').innerHTML = '<i class="ti ti-list"></i> Daftar Pesanan: ' + tabName;
+    
+    // Reset all tabs UI
+    const tabs = ['Semua', 'Perlu Dikirim', 'Dikirim', 'Selesai'];
+    tabs.forEach(t => {
+        const elId = 'tab-' + t.replace(' ', '-');
+        const el = document.getElementById(elId);
+        if(el) {
+            el.style.color = 'var(--text-secondary)';
+            el.style.borderBottom = '3px solid transparent';
+            el.classList.remove('active');
+        }
+    });
+    
+    // Set Active tab UI
+    const activeEl = document.getElementById('tab-' + tabName.replace(' ', '-'));
+    if(activeEl) {
+        activeEl.style.color = 'var(--brand-primary)';
+        activeEl.style.borderBottom = '3px solid var(--brand-primary)';
+        activeEl.classList.add('active');
+    }
+    
+    // For now, if we already have data loaded, just re-render the table with filtering (to be implemented)
+    // filterPackingTable();
+}
