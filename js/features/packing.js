@@ -1,12 +1,12 @@
 function updatePacking() {
-    if (!window.rawRows || window.rawRows.length === 0) return;
+    if (!rawRows || rawRows.length === 0) return;
 
     // Detect if this is an "Order to Ship" file by checking specific columns
     // Common columns in Shopee To Ship file:
     // "No. Pesanan", "No. Resi", "Opsi Pengiriman", "Nama Produk"
     
     // First, find header index map
-    const headers = window.rawHeaders || window.rawRows[0] || [];
+    const headers = rawHeaders || rawRows[0] || [];
     const hMap = {};
     for (let i = 0; i < headers.length; i++) {
         const val = String(headers[i] || '').trim().toLowerCase();
@@ -52,8 +52,8 @@ function updatePacking() {
     // Keep track of unique orders to count properly
     const uniqueOrders = new Set();
 
-    for (let i = 0; i < window.rawRows.length; i++) {
-        const row = window.rawRows[i];
+    for (let i = 0; i < rawRows.length; i++) {
+        const row = rawRows[i];
         if (!row || row.length === 0) continue;
 
         const noPesanan = String(row[idxNoPesanan] || '').trim();
