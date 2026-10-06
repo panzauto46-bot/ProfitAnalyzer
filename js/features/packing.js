@@ -195,7 +195,7 @@ function togglePackedCheckbox(cb) {
         span.innerText = 'Belum Packing';
         span.style.color = '#64748b';
     }
-}\n
+}
 function toggleProductStatus(btn) {
     if (btn.innerText.includes('Proses')) {
         btn.innerHTML = '<i class="ti ti-check"></i> Selesai';
@@ -209,3 +209,4 @@ function toggleProductStatus(btn) {
         btn.style.border = '1px solid #fed7aa';
     }
 }
+
