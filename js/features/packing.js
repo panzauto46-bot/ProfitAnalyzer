@@ -28,6 +28,7 @@ function updatePacking() {
     const idxJumlah = hMap['jumlah'];
     const idxCatatan = hMap['catatan dari pembeli'] || hMap['catatan pembeli'];
     const idxStatus = hMap['status pesanan'];
+    const idxBatalText = hMap['status batal/ pengembalian'] || hMap['alasan pembatalan'] || hMap['status batal'];
 
     const isEmptyState = document.getElementById('packingEmptyState');
     const isResultsArea = document.getElementById('packingResultsArea');
@@ -63,6 +64,7 @@ function updatePacking() {
                 resi: idxResi !== undefined ? String(row[idxResi] || '').trim() : '-',
                 kurir: idxKurir !== undefined ? String(row[idxKurir] || '').trim() : '-',
                 status: idxStatus !== undefined ? String(row[idxStatus] || '').trim() : 'Semua', // fallback
+                batalText: idxBatalText !== undefined ? String(row[idxBatalText] || '').trim() : '',
                 items: []
             };
         }
@@ -276,6 +278,7 @@ function renderPackingList() {
         order.items.forEach((item, idx) => {
             const isLast = idx === order.items.length - 1;
             const variantBadge = item.variasi ? `<span style="display:inline-flex; align-items:center; gap:4px; margin-top:6px; padding: 4px 10px; background: #f1f5f9; color: #475569; font-size:11px; border-radius:4px; font-weight:600;"><i class="ti ti-tag"></i> ${item.variasi}</span>` : '';
+            const batalBadge = order.batalText && order.batalText !== '-' ? `<div style="margin-top:8px; font-size:12px; color: #b91c1c; background:#fef2f2; padding:6px 10px; border-radius:6px; border: 1px solid #fca5a5; font-weight:600;"><i class="ti ti-alert-circle" style="margin-right:4px;"></i> <b>Info Retur/Batal:</b> ${order.batalText}</div>` : '';
             const catatanHtml = item.catatan ? `<div style="margin-top:8px; font-size:12px; color: #9a3412; background:#fff7ed; padding:8px 12px; border-radius:6px; border: 1px solid #ffedd5;"><i class="ti ti-message-2" style="margin-right:4px;"></i> <b>Catatan:</b> ${item.catatan}</div>` : '';
             
             itemsHtml += `
@@ -284,6 +287,7 @@ function renderPackingList() {
                         <div style="font-weight: 600; color: var(--text-primary); font-size: 13px; line-height: 1.4;">${item.produk}</div>
                         <div style="display:flex; flex-wrap:wrap; gap:6px;">${variantBadge}</div>
                         ${catatanHtml}
+                        ${batalBadge}
                     </div>
                     <div style="display: flex; align-items: center;">
                         <div style="font-size: 14px; font-weight: 700; color: var(--brand-primary); background: #ccfbf1; padding: 4px 12px; border-radius: 6px; border: 1px solid #99f6e4;">x${item.jumlah}</div>
