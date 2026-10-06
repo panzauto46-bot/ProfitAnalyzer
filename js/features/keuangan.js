@@ -167,14 +167,16 @@ function findMoneyCol(rows) {
     const headers = Object.keys(rows[0]);
     for (let h of headers) {
         let hl = h.toLowerCase();
-        if (hl.includes('jumlah') || hl.includes('nominal') || hl.includes('total') || hl.includes('pelepasan') || hl.includes('dana') || hl.includes('amount') || hl.includes('pembayaran') || hl.includes('penghasilan')) {
-            let isNumeric = false;
-            for(let i=0; i<Math.min(5, rows.length); i++) {
-                if (typeof rows[i][h] === 'number' || !isNaN(parseFloat(String(rows[i][h]).replace(/[^0-9.-]/g, '')))) {
-                    isNumeric = true; break;
+        if (!hl.includes('waktu') && !hl.includes('tanggal') && !hl.includes('date') && !hl.includes('time')) {
+            if (hl.includes('jumlah') || hl.includes('nominal') || hl.includes('total') || hl.includes('pelepasan') || hl.includes('dana') || hl.includes('amount') || hl.includes('pembayaran') || hl.includes('penghasilan')) {
+                let isNumeric = false;
+                for(let i=0; i<Math.min(5, rows.length); i++) {
+                    if (typeof rows[i][h] === 'number' || !isNaN(parseFloat(String(rows[i][h]).replace(/[^0-9.-]/g, '')))) {
+                        isNumeric = true; break;
+                    }
                 }
+                if (isNumeric) return h;
             }
-            if (isNumeric) return h;
         }
     }
     for (let h of headers) {
@@ -223,18 +225,20 @@ function renderKeuanganData(rows) {
     
     for (let h of headers) {
         let hl = h.toLowerCase();
-        if (hl.includes('jumlah') || hl.includes('nominal') || hl.includes('total') || hl.includes('pelepasan') || hl.includes('dana') || hl.includes('amount') || hl.includes('pembayaran') || hl.includes('penghasilan')) {
-            // verify if values are mostly numeric
-            let isNumeric = false;
-            for(let i=0; i<Math.min(5, rows.length); i++) {
-                if (typeof rows[i][h] === 'number' || !isNaN(parseFloat(String(rows[i][h]).replace(/[^0-9.-]/g, '')))) {
-                    isNumeric = true;
+        if (!hl.includes('waktu') && !hl.includes('tanggal') && !hl.includes('date') && !hl.includes('time')) {
+            if (hl.includes('jumlah') || hl.includes('nominal') || hl.includes('total') || hl.includes('pelepasan') || hl.includes('dana') || hl.includes('amount') || hl.includes('pembayaran') || hl.includes('penghasilan')) {
+                // verify if values are mostly numeric
+                let isNumeric = false;
+                for(let i=0; i<Math.min(5, rows.length); i++) {
+                    if (typeof rows[i][h] === 'number' || !isNaN(parseFloat(String(rows[i][h]).replace(/[^0-9.-]/g, '')))) {
+                        isNumeric = true;
+                        break;
+                    }
+                }
+                if (isNumeric) {
+                    moneyCol = h;
                     break;
                 }
-            }
-            if (isNumeric) {
-                moneyCol = h;
-                break;
             }
         }
     }
