@@ -127,7 +127,7 @@ function renderPackingList() {
             let st = o.status.toLowerCase();
             return (st.includes('dikirim') || st.includes('sedang dikirim')) && !st.includes('perlu dikirim');
         });
-    } else if (tab === 'Retur') {
+    } else if (tab === 'Dibatalkan') {
         filteredOrders = window.ordersData.filter(o => o.status.toLowerCase().includes('batal') || o.status.toLowerCase().includes('pengembalian') || o.status.toLowerCase().includes('dikembalikan'));
     } else if (tab === 'Selesai') {
         filteredOrders = window.ordersData.filter(o => o.status.toLowerCase().includes('selesai'));
@@ -190,7 +190,7 @@ function renderPackingList() {
                 window.packingStatusChartInstance = new Chart(ctxStatus, {
                     type: 'doughnut',
                     data: {
-                        labels: [`Perlu Dikirim (${pctP}%)`, `Dikirim (${pctD}%)`, `Selesai (${pctS}%)`, `Batal/Retur (${pctB}%)`],
+                        labels: [`Perlu Dikirim (${pctP}%)`, `Dikirim (${pctD}%)`, `Selesai (${pctS}%)`, `Dibatalkan (${pctB}%)`],
                         datasets: [{
                             data: [window.ordersStats.perluDikirim, window.ordersStats.dikirim, window.ordersStats.selesai, window.ordersStats.batal],
                             backgroundColor: ['#f97316', '#3b82f6', '#22c55e', '#ef4444'],
@@ -251,12 +251,12 @@ function renderPackingList() {
     const countPerlu = document.getElementById('count-perlu-dikirim');
     const countDikirim = document.getElementById('count-dikirim');
     const countSelesai = document.getElementById('count-selesai');
-    const countRetur = document.getElementById('count-retur');
+    const countDibatalkan = document.getElementById('count-dibatalkan');
     
     if (countPerlu) countPerlu.innerText = window.ordersStats.perluDikirim;
     if (countDikirim) countDikirim.innerText = window.ordersStats.dikirim;
     if (countSelesai) countSelesai.innerText = window.ordersStats.selesai;
-    if (countRetur) countRetur.innerText = window.ordersStats.batal;
+    if (countDibatalkan) countDibatalkan.innerText = window.ordersStats.batal;
 
     // Update Dashboard global stats
     const totalPesananEl = document.getElementById('packingStatPesanan');
@@ -407,7 +407,7 @@ function switchOrderTab(tabName) {
     }
     
     // Reset all tabs UI
-    const tabs = ['Dashboard', 'Semua', 'Perlu Dikirim', 'Dikirim', 'Selesai', 'Retur'];
+    const tabs = ['Dashboard', 'Semua', 'Perlu Dikirim', 'Dikirim', 'Selesai', 'Dibatalkan'];
     tabs.forEach(t => {
         const elId = 'tab-' + t.replace(' ', '-');
         const el = document.getElementById(elId);
