@@ -107,6 +107,11 @@ function updatePacking() {
                         <span class="status-text" style="font-weight:600; color:#64748b; font-size:14px; letter-spacing:0.5px;">Belum Packing</span>
                     </label>
                 </td>
+                <td style="padding: 16px 20px; vertical-align: top; border-bottom: 1px solid var(--border-light); width: 200px;">
+                    <button onclick="toggleProductStatus(this)" style="background:#fff7ed; color:#ea580c; border:1px solid #fed7aa; padding:8px 12px; border-radius:var(--radius-md); font-weight:600; font-size:12px; cursor:pointer; transition:all 0.2s; width:100px; display:flex; align-items:center; justify-content:center; gap:6px;">
+                        <i class="ti ti-loader"></i> Proses
+                    </button>
+                </td>
             </tr>
         `;
     }
@@ -189,5 +194,18 @@ function togglePackedCheckbox(cb) {
         tr.style.background = 'transparent';
         span.innerText = 'Belum Packing';
         span.style.color = '#64748b';
+    }
+}\n
+function toggleProductStatus(btn) {
+    if (btn.innerText.includes('Proses')) {
+        btn.innerHTML = '<i class="ti ti-check"></i> Selesai';
+        btn.style.background = '#dcfce7';
+        btn.style.color = '#166534';
+        btn.style.border = '1px solid #bbf7d0';
+    } else {
+        btn.innerHTML = '<i class="ti ti-loader"></i> Proses';
+        btn.style.background = '#fff7ed';
+        btn.style.color = '#ea580c';
+        btn.style.border = '1px solid #fed7aa';
     }
 }
