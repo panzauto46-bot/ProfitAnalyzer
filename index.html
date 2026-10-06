@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
+<!DOCTYPE html><html lang="id"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ProfitAnalyzer — E-Commerce Profit Calculator</title>
-    <meta name="description" content="Hitung profit bersih dari laporan TikTok Shop, Tokopedia & Shopee secara offline. Gratis, cepat, dan akurat.">
+    <meta name="description" content="Hitung profit bersih dari laporan TikTok Shop, Tokopedia &amp; Shopee secara offline. Gratis, cepat, dan akurat.">
     <!-- Tabler Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.42.0/dist/tabler-icons.min.css">
     <!-- SheetJS for Excel parsing -->
@@ -13,8 +11,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -89,12 +87,12 @@
         <div>
             <div class="sidebar-section-title">Import Data</div>
             <div class="upload-zone" id="uploadZone">
-                <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" multiple>
+                <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" multiple="">
                 <div class="upload-icon-wrap">
                     <i class="ti ti-file-upload" id="uploadIcon"></i>
                 </div>
                 <div class="upload-name" id="fileName">Drop file atau klik di sini</div>
-                <div class="upload-hint" id="fileHint">Mendukung CSV & Excel (.xlsx, .xls)</div>
+                <div class="upload-hint" id="fileHint">Mendukung CSV &amp; Excel (.xlsx, .xls)</div>
                 <span class="upload-badge" id="fileBadge"></span>
             </div>
             <div class="file-list" id="fileList"></div>
@@ -185,7 +183,7 @@
                     <i class="ti ti-chart-pie-2"></i>
                 </div>
                 <h3>Mulai Analisis Profit</h3>
-                <p>Import laporan penjualan dari TikTok Shop, Tokopedia, atau Shopee, lalu masukkan Admin Fee & COGS untuk melihat analisis profit Anda.</p>
+                <p>Import laporan penjualan dari TikTok Shop, Tokopedia, atau Shopee, lalu masukkan Admin Fee &amp; COGS untuk melihat analisis profit Anda.</p>
             </div>
 
             <!-- Results Area -->
@@ -281,6 +279,11 @@
 </div>
 
         <!-- TAB: Data Preview -->
+        
+
+        <!-- TAB: Iklan Toko -->
+        
+            </div>
         <div id="tabData" style="display:none;">
             <div class="card">
                 <div class="card-header">
@@ -303,10 +306,7 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- TAB: Iklan Toko -->
-        <div id="tabIklan" style="display:none;">
+        </div><div id="tabIklan" style="display:none;">
             <div class="card" style="margin-bottom: var(--space-5); box-shadow: none; border: 1px solid var(--border-light);">
                 <div class="card-body" style="padding: 16px 20px;">
                     <div class="tabs" style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 4px;">
@@ -353,7 +353,7 @@
                         <div class="stats-grid" style="grid-template-columns: 1fr; margin-bottom: var(--space-4);">
                             <div class="stat-card" style="display:flex; justify-content:space-between; align-items:center;">
                                 <div>
-                                    <div class="stat-title" style="cursor:pointer;" onclick="showToast('Persentase margin keuntungan setelah dipotong modal & admin (sebelum dipotong biaya iklan).', 'info')">Keuntungan Kotor (%) <i class="ti ti-info-circle" style="color: var(--brand-primary); font-size: 14px;"></i></div>
+                                    <div class="stat-title" style="cursor:pointer;" onclick="showToast('Persentase margin keuntungan setelah dipotong modal &amp; admin (sebelum dipotong biaya iklan).', 'info')">Keuntungan Kotor (%) <i class="ti ti-info-circle" style="color: var(--brand-primary); font-size: 14px;"></i></div>
                                     <div class="stat-value" id="simGrossMargin">0%</div>
                                 </div>
                             </div>
@@ -374,7 +374,7 @@
                         <!-- Burn Rate Indicator -->
                         <div class="card" style="border: 1px solid var(--border-light); box-shadow:none;">
                             <div class="card-body">
-                                <div style="font-weight: 600; margin-bottom: 8px; cursor:pointer;" onclick="showToast('Simulasi berapa banyak barang yang harus laku sebelum budget iklan harian Anda habis.', 'info')">Simulasi Target & Ketahanan Budget Iklan <i class="ti ti-info-circle" style="color: var(--brand-primary); font-size: 14px;"></i></div>
+                                <div style="font-weight: 600; margin-bottom: 8px; cursor:pointer;" onclick="showToast('Simulasi berapa banyak barang yang harus laku sebelum budget iklan harian Anda habis.', 'info')">Simulasi Target &amp; Ketahanan Budget Iklan <i class="ti ti-info-circle" style="color: var(--brand-primary); font-size: 14px;"></i></div>
                                 <div id="simBurnRateAlert" style="padding: 16px; border-radius: var(--radius-md); background: var(--bg-tertiary); color: var(--text-secondary); font-size: 14px; line-height: 1.5;">
                                     Silakan isi data di sebelah kiri untuk melihat simulasi strategi iklan Anda.
                                 </div>
@@ -430,15 +430,10 @@
                 </div>
             </div>
                 </div>
-            </div>
-            </div>
-        </div>
-
-        <!-- TAB: Keuangan -->
-        <div id="tabKeuangan" style="display:none;">
+            </div><div id="tabKeuangan" style="display:none;">
             <div class="card">
                 <div class="card-header">
-                    <span class="card-header-title"><i class="ti ti-wallet"></i> Keuangan (Penarikan & Transaksi)</span>
+                    <span class="card-header-title"><i class="ti ti-wallet"></i> Keuangan (Penarikan &amp; Transaksi)</span>
                 </div>
                 <div class="card-body" style="min-height: 400px;">
                     <div class="tabs" style="display: flex; gap: var(--space-2); margin-bottom: var(--space-5); border-bottom: 1px solid var(--border-light); padding-bottom: var(--space-3); overflow-x: auto;">
@@ -518,11 +513,14 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div></div>
+
+        <!-- TAB: Keuangan -->
+        
     </div>
 
     
-</div>
+
 <!-- ═══════════════════════════════════════════════════
      TOAST CONTAINER
      ═══════════════════════════════════════════════════ -->
@@ -561,5 +559,6 @@
     <script src="js/features/iklan.js"></script>
     <script src="js/features/keuangan.js"></script>
 
-</body>
-</html>
+
+
+</body></html>
