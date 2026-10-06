@@ -204,35 +204,17 @@ function renderPackingList() {
                         responsive: true,
                         maintainAspectRatio: false,
                         cutoutPercentage: 50,
-                        plugins: {
-                            datalabels: {
-                                color: '#ffffff',
-                                font: {
-                                    family: "'Inter', sans-serif",
-                                    weight: 'bold',
-                                    size: 11
-                                },
-                                textAlign: 'center',
-                                formatter: function(value, context) {
-                                    if (value === 0) return null;
-                                    let label = context.chart.data.labels[context.dataIndex];
-                                    let parts = label.split(' (');
-                                    let name = parts[0];
-                                    let pct = parts[1] ? parts[1].replace(')', '') : '';
-                                    
-                                    // If slice is too small, just show percentage or nothing
-                                    let t = context.dataset.data.reduce((a,b) => a+b, 0);
-                                    let percentage = (value / t) * 100;
-                                    
-                                    if (percentage < 5) return null; // hide if too small
-                                    if (percentage < 10) return pct + '%'; // only show % if kinda small
-                                    
-                                    return name + '\n' + pct + '%';
-                                }
-                            }
-                        },
+                        
                         legend: {
-                            display: false
+                            display: true,
+                            position: 'right',
+                            labels: {
+                                padding: 20,
+                                fontFamily: "'Inter', sans-serif",
+                                fontColor: '#475569',
+                                usePointStyle: true,
+                                fontSize: 13
+                            }
                         },
                         tooltips: {
                             backgroundColor: 'rgba(15, 23, 42, 0.9)',
