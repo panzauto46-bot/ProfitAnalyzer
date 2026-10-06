@@ -125,7 +125,7 @@ function saveHistory(result) {
 
 function clearHistory() {
     if (confirm('Anda yakin ingin menghapus semua riwayat kalkulasi?')) {
-        localStorage.removeItem('profitHistory');
+        localStorage.removeItem('profitAnalyzerHistory');
         renderHistory();
         showToast('Riwayat berhasil dihapus', 'success');
     }
@@ -174,11 +174,7 @@ function loadHistory(index) {
     showToast(`Konfigurasi dari "${h.fileName}" dimuat. Upload file yang sama lalu klik Kalkulasi.`, 'info', 5000);
 }
 
-function clearHistory() {
-    localStorage.removeItem('profitAnalyzerHistory');
-    renderHistory();
-    showToast('Riwayat dihapus', 'success');
-}
+
 
 
 
