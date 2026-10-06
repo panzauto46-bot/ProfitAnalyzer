@@ -77,7 +77,12 @@ function showToast(msg, type = 'info', duration = 3500) {
 // SIDEBAR TOGGLE (mobile)
 // ═══════════════════════════════════════════════════
 function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('open');
+    const sidebar = document.getElementById('sidebar');
+    if (window.innerWidth <= 768) {
+        sidebar.classList.toggle('open');
+    } else {
+        sidebar.classList.toggle('collapsed');
+    }
 }
 
 
