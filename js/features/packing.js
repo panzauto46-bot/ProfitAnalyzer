@@ -127,6 +127,8 @@ function renderPackingList() {
             let st = o.status.toLowerCase();
             return (st.includes('dikirim') || st.includes('sedang dikirim')) && !st.includes('perlu dikirim');
         });
+    } else if (tab === 'Retur') {
+        filteredOrders = window.ordersData.filter(o => o.status.toLowerCase().includes('batal') || o.status.toLowerCase().includes('pengembalian') || o.status.toLowerCase().includes('dikembalikan'));
     } else if (tab === 'Selesai') {
         filteredOrders = window.ordersData.filter(o => o.status.toLowerCase().includes('selesai'));
     } else if (tab === 'Dashboard') {
@@ -249,10 +251,12 @@ function renderPackingList() {
     const countPerlu = document.getElementById('count-perlu-dikirim');
     const countDikirim = document.getElementById('count-dikirim');
     const countSelesai = document.getElementById('count-selesai');
+    const countRetur = document.getElementById('count-retur');
     
     if (countPerlu) countPerlu.innerText = window.ordersStats.perluDikirim;
     if (countDikirim) countDikirim.innerText = window.ordersStats.dikirim;
     if (countSelesai) countSelesai.innerText = window.ordersStats.selesai;
+    if (countRetur) countRetur.innerText = window.ordersStats.batal;
 
     // Update Dashboard global stats
     const totalPesananEl = document.getElementById('packingStatPesanan');
@@ -403,7 +407,7 @@ function switchOrderTab(tabName) {
     }
     
     // Reset all tabs UI
-    const tabs = ['Dashboard', 'Semua', 'Perlu Dikirim', 'Dikirim', 'Selesai'];
+    const tabs = ['Dashboard', 'Semua', 'Perlu Dikirim', 'Dikirim', 'Selesai', 'Retur'];
     tabs.forEach(t => {
         const elId = 'tab-' + t.replace(' ', '-');
         const el = document.getElementById(elId);
