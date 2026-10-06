@@ -179,10 +179,16 @@ function renderPackingList() {
                 if (window.packingStatusChartInstance) {
                     window.packingStatusChartInstance.destroy();
                 }
+                let tStat = window.ordersStats.perluDikirim + window.ordersStats.dikirim + window.ordersStats.selesai + window.ordersStats.batal;
+                let pctP = tStat ? Math.round((window.ordersStats.perluDikirim/tStat)*100) : 0;
+                let pctD = tStat ? Math.round((window.ordersStats.dikirim/tStat)*100) : 0;
+                let pctS = tStat ? Math.round((window.ordersStats.selesai/tStat)*100) : 0;
+                let pctB = tStat ? Math.round((window.ordersStats.batal/tStat)*100) : 0;
+                
                 window.packingStatusChartInstance = new Chart(ctxStatus, {
                     type: 'doughnut',
                     data: {
-                        labels: ['Perlu Dikirim', 'Dikirim', 'Selesai', 'Batal/Retur'],
+                        labels: [`Perlu Dikirim (${pctP}%)`, `Dikirim (${pctD}%)`, `Selesai (${pctS}%)`, `Batal/Retur (${pctB}%)`],
                         datasets: [{
                             data: [window.ordersStats.perluDikirim, window.ordersStats.dikirim, window.ordersStats.selesai, window.ordersStats.batal],
                             backgroundColor: ['#f97316', '#3b82f6', '#22c55e', '#ef4444'],
@@ -208,7 +214,19 @@ function renderPackingList() {
                             titleFontFamily: "'Inter', sans-serif",
                             bodyFontFamily: "'Inter', sans-serif",
                             padding: 12,
-                            cornerRadius: 8
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(tooltipItem, data) {
+                                    var dataset = data.datasets[tooltipItem.datasetIndex];
+                                    var total = dataset.data.reduce(function(previousValue, currentValue, currentIndex, array) {
+                                        return previousValue + currentValue;
+                                    });
+                                    var currentValue = dataset.data[tooltipItem.index];
+                                    var percentage = Math.floor(((currentValue/total) * 100)+0.5);
+                                    var label = data.labels[tooltipItem.index] || '';
+                                    return ' ' + currentValue + ' pesanan';
+                                }
+                            }
                         }
                     }
                 });
