@@ -5,6 +5,7 @@ window.ordersStats = {
     perluDikirim: 0,
     dikirim: 0,
     selesai: 0,
+    batal: 0,
     qty: 0,
     kurir: {}
 };
@@ -47,7 +48,7 @@ function updatePacking() {
     if (isResultsArea) isResultsArea.style.display = 'block';
 
     const ordersMap = {};
-    window.ordersStats = { total: 0, perluDikirim: 0, dikirim: 0, selesai: 0, qty: 0, kurir: {} };
+    window.ordersStats = { total: 0, perluDikirim: 0, dikirim: 0, selesai: 0, batal: 0, qty: 0, kurir: {} };
 
     for (let i = 0; i < rawRows.length; i++) {
         const row = rawRows[i];
@@ -95,6 +96,7 @@ function updatePacking() {
         if (st.includes('perlu dikirim')) window.ordersStats.perluDikirim++;
         else if (st.includes('dikirim') || st.includes('sedang dikirim')) window.ordersStats.dikirim++;
         else if (st.includes('selesai')) window.ordersStats.selesai++;
+        else if (st.includes('batal') || st.includes('pengembalian') || st.includes('dikembalikan')) window.ordersStats.batal++;
     });
 
     // Update filter kurir dropdown
@@ -180,10 +182,10 @@ function renderPackingList() {
                 window.packingStatusChartInstance = new Chart(ctxStatus, {
                     type: 'doughnut',
                     data: {
-                        labels: ['Perlu Dikirim', 'Dikirim', 'Selesai'],
+                        labels: ['Perlu Dikirim', 'Dikirim', 'Selesai', 'Batal/Retur'],
                         datasets: [{
-                            data: [window.ordersStats.perluDikirim, window.ordersStats.dikirim, window.ordersStats.selesai],
-                            backgroundColor: ['#f97316', '#3b82f6', '#22c55e'],
+                            data: [window.ordersStats.perluDikirim, window.ordersStats.dikirim, window.ordersStats.selesai, window.ordersStats.batal],
+                            backgroundColor: ['#f97316', '#3b82f6', '#22c55e', '#ef4444'],
                             borderWidth: 0,
                             hoverOffset: 4
                         }]
