@@ -1679,11 +1679,90 @@
 
         <!-- TAB: Iklan Toko -->
         <div id="tabIklan" style="display:none;">
+            <div class="card" style="margin-bottom: var(--space-5); box-shadow: none; border: 1px solid var(--border-light);">
+                <div class="card-body" style="padding-bottom: 0;">
+                    <div class="tabs" style="display: flex; gap: var(--space-2); margin-bottom: 0; border-bottom: none; overflow-x: auto;">
+                        <button class="btn btn-outline" style="border-radius: var(--radius-full); background: var(--brand-light); color: var(--brand-dark); border-color: var(--brand-secondary); white-space: nowrap;" id="btnIklanSimulator" onclick="switchIklanTab('simulator')"><i class="ti ti-target"></i> Simulator Target ROI</button>
+                        <button class="btn btn-outline" style="border-radius: var(--radius-full); white-space: nowrap;" id="btnIklanAnalitik" onclick="switchIklanTab('analitik')"><i class="ti ti-file-analytics"></i> Analitik Laporan</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SIMULATOR AREA -->
+            <div id="iklanSimulatorArea" style="display:block;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-5);">
+                    <!-- Inputs -->
+                    <div class="card" style="box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                        <div class="card-header">
+                            <span class="card-header-title"><i class="ti ti-settings"></i> Konfigurasi Ad Strategy</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group" style="margin-bottom: var(--space-4);">
+                                <label style="display:block; margin-bottom: var(--space-2); font-weight: 500; font-size: 14px;">Selling Price / Harga Jual (Rp)</label>
+                                <input type="number" id="simHargaJual" class="form-control" placeholder="Contoh: 100000" oninput="calculateSimulator()" style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md);">
+                            </div>
+                            <div class="form-group" style="margin-bottom: var(--space-4);">
+                                <label style="display:block; margin-bottom: var(--space-2); font-weight: 500; font-size: 14px;">COGS / Modal (Rp)</label>
+                                <input type="number" id="simModal" class="form-control" placeholder="Contoh: 40000" oninput="calculateSimulator()" style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md);">
+                            </div>
+                            <div class="form-group" style="margin-bottom: var(--space-4);">
+                                <label style="display:block; margin-bottom: var(--space-2); font-weight: 500; font-size: 14px;">Admin Fee (%)</label>
+                                <input type="number" id="simAdminFee" class="form-control" placeholder="Contoh: 6.5" oninput="calculateSimulator()" style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md);" step="0.1">
+                            </div>
+                            <div class="form-group" style="margin-bottom: var(--space-4);">
+                                <label style="display:block; margin-bottom: var(--space-2); font-weight: 500; font-size: 14px;">Daily Ad Budget (Rp)</label>
+                                <input type="number" id="simBudget" class="form-control" placeholder="Contoh: 100000" oninput="calculateSimulator()" style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md);">
+                            </div>
+                            <div class="form-group">
+                                <label style="display:block; margin-bottom: var(--space-2); font-weight: 500; font-size: 14px;">Target ROI (ROAS)</label>
+                                <input type="number" id="simTargetRoi" class="form-control" placeholder="Contoh: 5.0" step="0.1" oninput="calculateSimulator()" style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md);">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Outputs -->
+                    <div>
+                        <div class="stats-grid" style="grid-template-columns: 1fr; margin-bottom: var(--space-4);">
+                            <div class="stat-card" style="display:flex; justify-content:space-between; align-items:center;">
+                                <div>
+                                    <div class="stat-title" title="Persentase margin kotor yang tersisa setelah modal dan admin fee">Gross Margin (%) ℹ️</div>
+                                    <div class="stat-value" id="simGrossMargin">0%</div>
+                                </div>
+                            </div>
+                            <div class="stat-card" style="display:flex; justify-content:space-between; align-items:center;">
+                                <div>
+                                    <div class="stat-title" title="Target ROI minimum absolut agar Anda tidak rugi (Titik Impas)">Breakeven ROI ℹ️</div>
+                                    <div class="stat-value" id="simBreakevenRoi" style="color: var(--brand-primary);">0.0</div>
+                                </div>
+                            </div>
+                            <div class="stat-card" style="display:flex; justify-content:space-between; align-items:center;">
+                                <div>
+                                    <div class="stat-title">Net Profit per Item (after Ads)</div>
+                                    <div class="stat-value" id="simNetProfit">Rp 0</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Burn Rate Indicator -->
+                        <div class="card" style="border: 1px solid var(--border-light); box-shadow:none;">
+                            <div class="card-body">
+                                <div style="font-weight: 600; margin-bottom: 8px;" title="Seberapa cepat Daily Budget Anda akan habis berdasarkan setingan Target ROI">Burn Rate Indicator ℹ️</div>
+                                <div id="simBurnRateAlert" style="padding: 16px; border-radius: var(--radius-md); background: var(--bg-tertiary); color: var(--text-secondary); font-size: 14px; line-height: 1.5;">
+                                    Silakan isi data di sebelah kiri untuk melihat simulasi strategi iklan Anda.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ANALITIK LAPORAN AREA -->
+            <div id="iklanAnalitikArea" style="display:none;">
             <div class="empty-state" id="iklanEmptyState">
                 <div class="empty-state-icon">
                     <i class="ti ti-ad"></i>
                 </div>
-                <h3>Analitik Iklan Toko</h3>
+                <h3>Analitik Laporan Iklan Toko</h3>
                 <p>Import laporan performa iklan untuk melihat ringkasan ROI dan detail performa per produk secara instan.</p>
             </div>
             
@@ -1721,6 +1800,9 @@
                         </div>
                     </div>
                 </div>
+            </div>
+                </div>
+            </div>
             </div>
         </div>
 
@@ -2755,6 +2837,86 @@ function resetAll() {
     switchTab('analyzer');
 
     showToast('Data telah direset', 'success');
+}
+
+// ═══════════════════════════════════════════════════
+// IKLAN SIMULATOR LOGIC
+// ═══════════════════════════════════════════════════
+function switchIklanTab(tab) {
+    const btnSim = document.getElementById('btnIklanSimulator');
+    const btnAna = document.getElementById('btnIklanAnalitik');
+    
+    if (tab === 'simulator') {
+        document.getElementById('iklanSimulatorArea').style.display = 'block';
+        document.getElementById('iklanAnalitikArea').style.display = 'none';
+        
+        btnSim.style.background = 'var(--brand-light)';
+        btnSim.style.color = 'var(--brand-dark)';
+        btnSim.style.borderColor = 'var(--brand-secondary)';
+        
+        btnAna.style.background = 'transparent';
+        btnAna.style.color = 'var(--text-secondary)';
+        btnAna.style.borderColor = 'var(--border-light)';
+    } else {
+        document.getElementById('iklanSimulatorArea').style.display = 'none';
+        document.getElementById('iklanAnalitikArea').style.display = 'block';
+        
+        btnAna.style.background = 'var(--brand-light)';
+        btnAna.style.color = 'var(--brand-dark)';
+        btnAna.style.borderColor = 'var(--brand-secondary)';
+        
+        btnSim.style.background = 'transparent';
+        btnSim.style.color = 'var(--text-secondary)';
+        btnSim.style.borderColor = 'var(--border-light)';
+    }
+}
+
+function calculateSimulator() {
+    let harga = parseFloat(document.getElementById('simHargaJual').value) || 0;
+    let cogs = parseFloat(document.getElementById('simModal').value) || 0;
+    let adminFee = parseFloat(document.getElementById('simAdminFee').value) || 0;
+    let budget = parseFloat(document.getElementById('simBudget').value) || 0;
+    let targetRoi = parseFloat(document.getElementById('simTargetRoi').value) || 0;
+
+    let grossProfit = harga - cogs - (harga * (adminFee / 100));
+    let grossMargin = harga > 0 ? (grossProfit / harga) * 100 : 0;
+    let breakevenRoi = grossMargin > 0 ? (100 / grossMargin) : 0;
+    let projectedAdSpend = targetRoi > 0 ? (100 / targetRoi) : 0;
+    let netProfit = grossProfit - (harga * (projectedAdSpend / 100));
+
+    let marginEl = document.getElementById('simGrossMargin');
+    let breakevenEl = document.getElementById('simBreakevenRoi');
+    let netProfitEl = document.getElementById('simNetProfit');
+    let alertBox = document.getElementById('simBurnRateAlert');
+
+    marginEl.innerText = grossMargin.toFixed(1) + '%';
+    breakevenEl.innerText = breakevenRoi > 0 ? breakevenRoi.toFixed(2) : '0.0';
+    netProfitEl.innerText = rp(netProfit);
+
+    // Dynamic Coloring for Net Profit
+    netProfitEl.style.color = netProfit > 0 ? 'var(--success)' : (netProfit < 0 ? 'var(--danger)' : 'var(--text-primary)');
+
+    if (harga === 0 || targetRoi === 0) {
+        alertBox.style.background = 'var(--bg-tertiary)';
+        alertBox.style.color = 'var(--text-secondary)';
+        alertBox.style.border = 'none';
+        alertBox.innerHTML = 'Silakan isi <strong>Selling Price</strong>, <strong>COGS</strong>, dan <strong>Target ROI</strong> untuk melihat simulasi strategi iklan Anda.';
+    } else if (targetRoi < breakevenRoi) {
+        alertBox.style.background = '#fef2f2';
+        alertBox.style.color = '#dc2626';
+        alertBox.style.border = '1px solid #f87171';
+        alertBox.innerHTML = '<strong>🔴 CRITICAL (Loss Warning):</strong><br>Target ROI terlalu rendah! Biaya pengeluaran iklan Anda melebihi gross margin. Anda akan RUGI (Burn Rate 100% loss). Tingkatkan Target ROI Anda setidaknya melebihi ' + breakevenRoi.toFixed(2) + '!';
+    } else if (targetRoi <= breakevenRoi + 2.0) {
+        alertBox.style.background = '#fefce8';
+        alertBox.style.color = '#ca8a04';
+        alertBox.style.border = '1px solid #facc15';
+        alertBox.innerHTML = '<strong>🟡 WARNING (Aggressive Strategy):</strong><br>Budget harian akan cepat habis (Burn Rate 1-3 jam). Risiko tinggi jika konversi melambat. Sangat butuh pantauan ketat!';
+    } else {
+        alertBox.style.background = '#f0fdf4';
+        alertBox.style.color = '#16a34a';
+        alertBox.style.border = '1px solid #4ade80';
+        alertBox.innerHTML = '<strong>🟢 SAFE (Conservative Strategy):</strong><br>Budget harian akan awet berjam-jam (kemungkinan bertahan 24 jam). Sistem hanya akan melempar iklan ke audiens yang sangat tertarget/pasti beli. Aman ditinggal tidur.';
+    }
 }
 
 // ═══════════════════════════════════════════════════
