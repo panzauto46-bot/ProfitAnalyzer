@@ -134,126 +134,15 @@ function renderPackingList() {
     } else if (tab === 'Selesai') {
         filteredOrders = window.ordersData.filter(o => o.status.toLowerCase().includes('selesai'));
     } else if (tab === 'Dashboard') {
-        // Build Modern Dashboard UI
-        
-        let kurirHtml = '';
-        const kurirEntries = Object.entries(window.ordersStats.kurirCount || {});
-        kurirEntries.sort((a,b) => b[1] - a[1]);
-        
-        kurirEntries.forEach((k, i) => {
-            kurirHtml += `
-                <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px 0; border-bottom: ${i === kurirEntries.length-1 ? 'none' : '1px dashed #e2e8f0'};">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <div style="width:32px; height:32px; border-radius:8px; background:#f1f5f9; color:#475569; display:flex; align-items:center; justify-content:center; font-weight:bold;">${i+1}</div>
-                        <span style="font-weight:600; color:var(--text-primary); font-size:14px;">${k[0]}</span>
-                    </div>
-                    <div style="font-weight:700; color:var(--brand-primary); font-size:14px; background:#ccfbf1; padding: 4px 12px; border-radius:20px;">${k[1]} pesanan</div>
-                </div>
-            `;
-        });
-        
-        if (!kurirHtml) kurirHtml = '<div style="text-align:center; color:#94a3b8; font-size:13px; padding:20px 0;">Belum ada data ekspedisi</div>';
-
-        container.innerHTML = `
-            <div style="animation: fadeIn 0.4s ease;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
-                    <!-- Status Chart -->
-                    <div style="background: white; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
-                        <h3 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; display:flex; align-items:center; gap:8px;"><i class="ti ti-chart-pie" style="color:var(--brand-primary);"></i> Komposisi Status Pesanan</h3>
-                        <div style="position: relative; height: 260px; width: 100%;">
-                            <canvas id="packingStatusChart"></canvas>
-                        </div>
-                    </div>
-                    
-                    <!-- Kurir Top List -->
-                    <div style="background: white; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); display:flex; flex-direction:column;">
-                        <h3 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; display:flex; align-items:center; gap:8px;"><i class="ti ti-truck-delivery" style="color:#f59e0b;"></i> Distribusi Ekspedisi</h3>
-                        <div style="flex:1; overflow-y:auto; padding-right:8px;">
-                            ${kurirHtml}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        // Render Chart
-        setTimeout(() => {
-            const ctxStatus = document.getElementById('packingStatusChart');
-            if (ctxStatus && window.Chart) {
-                if (window.packingStatusChartInstance) {
-                    window.packingStatusChartInstance.destroy();
-                }
-                let tStat = window.ordersStats.perluDikirim + window.ordersStats.dikirim + window.ordersStats.selesai + window.ordersStats.batal;
-                let pctP = tStat ? Math.round((window.ordersStats.perluDikirim/tStat)*100) : 0;
-                let pctD = tStat ? Math.round((window.ordersStats.dikirim/tStat)*100) : 0;
-                let pctS = tStat ? Math.round((window.ordersStats.selesai/tStat)*100) : 0;
-                let pctB = tStat ? Math.round((window.ordersStats.batal/tStat)*100) : 0;
-                
-                window.packingStatusChartInstance = new Chart(ctxStatus, {
-                    type: 'doughnut',
-                    data: {
-                        labels: [`Perlu Dikirim (${pctP}%)`, `Dikirim (${pctD}%)`, `Selesai (${pctS}%)`, `Dibatalkan (${pctB}%)`],
-                        datasets: [{
-                            data: [window.ordersStats.perluDikirim, window.ordersStats.dikirim, window.ordersStats.selesai, window.ordersStats.batal],
-                            backgroundColor: ['#f97316', '#3b82f6', '#22c55e', '#ef4444'],
-                            borderWidth: 0,
-                            hoverOffset: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        cutoutPercentage: 50,
-                        
-                        legend: {
-                            display: true,
-                            position: 'right',
-                            labels: {
-                                padding: 20,
-                                fontFamily: "'Inter', sans-serif",
-                                fontColor: '#475569',
-                                usePointStyle: true,
-                                fontSize: 13
-                            }
-                        },
-                        tooltips: {
-                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                            titleFontFamily: "'Inter', sans-serif",
-                            bodyFontFamily: "'Inter', sans-serif",
-                            padding: 12,
-                            cornerRadius: 8,
-                            callbacks: {
-                                label: function(tooltipItem, data) {
-                                    var dataset = data.datasets[tooltipItem.datasetIndex];
-                                    var total = dataset.data.reduce(function(previousValue, currentValue, currentIndex, array) {
-                                        return previousValue + currentValue;
-                                    });
-                                    var currentValue = dataset.data[tooltipItem.index];
-                                    var percentage = Math.floor(((currentValue/total) * 100)+0.5);
-                                    var label = data.labels[tooltipItem.index] || '';
-                                    return ' ' + currentValue + ' pesanan';
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-        }, 50);
-        
-        // Update stats top row
-        document.getElementById('packingStatPesanan').innerText = window.ordersStats.total.toLocaleString('id-ID');
-        document.getElementById('packingStatBarang').innerText = window.ordersStats.qty.toLocaleString('id-ID');
+        if (typeof renderDashboard === 'function') {
+            renderDashboard(container);
+        } else {
+            console.error('renderDashboard is not defined. Make sure dashboard.js is loaded.');
+        }
         return;
     }
 
-    // Filter by Kurir Dropdown
-    const kurirSelect = document.getElementById('packingKurirFilter');
-    if (kurirSelect && kurirSelect.value !== 'all') {
-        filteredOrders = filteredOrders.filter(o => o.kurir === kurirSelect.value);
-    }
-
-    // Update Counts in Tabs UI
-    const countPerlu = document.getElementById('count-perlu-dikirim');
+    const countPerlu = document.getElementById('count-perlu');
     const countDikirim = document.getElementById('count-dikirim');
     const countSelesai = document.getElementById('count-selesai');
     const countDibatalkan = document.getElementById('count-dibatalkan');
