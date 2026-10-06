@@ -1530,7 +1530,10 @@
 
         <!-- History -->
         <div>
-            <div class="sidebar-section-title">Riwayat Kalkulasi</div>
+            <div class="sidebar-section-title" style="display: flex; justify-content: space-between; align-items: center;">
+                <span>Riwayat Kalkulasi</span>
+                <span onclick="clearHistory()" style="font-size:11px; color:var(--text-tertiary); cursor:pointer; font-weight:normal; text-transform:none;"><i class="ti ti-trash"></i> Bersihkan</span>
+            </div>
             <div class="history-list" id="historyList">
                 <div class="history-empty" id="historyEmpty">
                     <i class="ti ti-history"></i>
@@ -1760,8 +1763,8 @@
                             <div class="card-header" style="border-bottom: 1px solid var(--border-light);">
                                 <span class="card-header-title"><i class="ti ti-chart-bar"></i> Grafik Ringkasan Keuangan</span>
                             </div>
-                            <div class="card-body">
-                                <canvas id="keuanganChart" height="100"></canvas>
+                            <div class="card-body" style="height: 300px; padding: var(--space-4);">
+                                <canvas id="keuanganChart"></canvas>
                             </div>
                         </div>
                         
@@ -2565,6 +2568,14 @@ function saveHistory(result) {
     renderHistory();
 }
 
+function clearHistory() {
+    if (confirm('Anda yakin ingin menghapus semua riwayat kalkulasi?')) {
+        localStorage.removeItem('profitHistory');
+        renderHistory();
+        showToast('Riwayat berhasil dihapus', 'success');
+    }
+}
+
 function renderHistory() {
     const history = getHistory();
     const list = document.getElementById('historyList');
@@ -2921,6 +2932,7 @@ function updateKeuanganDashboard() {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: { display: false }
             },
