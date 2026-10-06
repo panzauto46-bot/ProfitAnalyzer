@@ -101,8 +101,11 @@ function updatePacking() {
                         ${jumlah}
                     </div>
                 </td>
-                <td style="text-align:center; padding: 16px 20px; vertical-align: top; border-bottom: 1px solid var(--border-light);">
-                    <button onclick="togglePacked(this)" style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; padding:8px 12px; border-radius:var(--radius-md); font-weight:600; font-size:12px; cursor:pointer; transition:all 0.2s;"><i class="ti ti-box"></i> Packing</button>
+                <td style="padding: 16px 20px; vertical-align: top; border-bottom: 1px solid var(--border-light); width: 250px;">
+                    <label style="cursor:pointer; display:inline-flex; align-items:center; gap:12px; padding: 10px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); transition: all 0.2s; width: 100%;">
+                        <input type="checkbox" onchange="togglePackedCheckbox(this)" style="width:22px; height:22px; cursor:pointer; accent-color: var(--brand-primary);">
+                        <span class="status-text" style="font-weight:600; color:#64748b; font-size:14px; letter-spacing:0.5px;">Belum Packing</span>
+                    </label>
                 </td>
             </tr>
         `;
@@ -171,23 +174,21 @@ function printSimpleLabel(noPesanan) {
     w.document.close();
 }
 
-function togglePacked(btn) {
-    const tr = btn.closest('tr');
-    if (tr.classList.contains('packed-row')) {
-        tr.classList.remove('packed-row');
-        tr.style.opacity = '1';
-        tr.style.background = 'transparent';
-        btn.innerHTML = '<i class="ti ti-box"></i> Packing';
-        btn.style.background = '#f1f5f9';
-        btn.style.color = '#475569';
-        btn.style.border = '1px solid #cbd5e1';
-    } else {
+function togglePackedCheckbox(cb) {
+    const tr = cb.closest('tr');
+    const span = tr.querySelector('.status-text');
+    if (cb.checked) {
         tr.classList.add('packed-row');
         tr.style.opacity = '0.5';
         tr.style.background = '#f0fdf4';
-        btn.innerHTML = '<i class="ti ti-check"></i> Selesai';
-        btn.style.background = '#dcfce7';
-        btn.style.color = '#166534';
-        btn.style.border = '1px solid #bbf7d0';
+        span.innerText = 'SUDAH PACKING';
+        span.style.color = '#166534';
+    } else {
+        tr.classList.remove('packed-row');
+        tr.style.opacity = '1';
+        tr.style.background = 'transparent';
+        span.innerText = 'Belum Packing';
+        span.style.color = '#64748b';
     }
+}
 }
