@@ -101,6 +101,9 @@ function updatePacking() {
                         ${jumlah}
                     </div>
                 </td>
+                <td style="text-align:center; padding: 16px 20px; vertical-align: top; border-bottom: 1px solid var(--border-light);">
+                    <button onclick="togglePacked(this)" style="background:var(--brand-light); color:var(--brand-primary); border:none; padding:8px 12px; border-radius:var(--radius-md); font-weight:600; font-size:12px; cursor:pointer; transition:all 0.2s;"><i class="ti ti-check"></i> Selesai</button>
+                </td>
             </tr>
         `;
     }
@@ -166,4 +169,23 @@ function printSimpleLabel(noPesanan) {
         </html>
     `);
     w.document.close();
+}
+
+function togglePacked(btn) {
+    const tr = btn.closest('tr');
+    if (tr.classList.contains('packed-row')) {
+        tr.classList.remove('packed-row');
+        tr.style.opacity = '1';
+        tr.style.background = 'transparent';
+        btn.innerHTML = '<i class="ti ti-check"></i> Selesai';
+        btn.style.background = 'var(--brand-light)';
+        btn.style.color = 'var(--brand-primary)';
+    } else {
+        tr.classList.add('packed-row');
+        tr.style.opacity = '0.5';
+        tr.style.background = '#f0fdf4';
+        btn.innerHTML = '<i class="ti ti-x"></i> Batal';
+        btn.style.background = '#fee2e2';
+        btn.style.color = '#ef4444';
+    }
 }
