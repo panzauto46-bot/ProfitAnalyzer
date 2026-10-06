@@ -214,8 +214,19 @@ function parseExcelFull(arrayBuffer) {
 
     if (allRows.length === 0) throw new Error('Excel file kosong');
 
-    const headers = allRows[0].map(h => String(h).trim());
-    const rows = allRows.slice(1).filter(r => r.some(cell => cell !== '' && cell != null));
+    // Temukan baris header sebenarnya (baris dengan jumlah kolom terbanyak di awal file)
+    let headerIdx = 0;
+    let maxCols = 0;
+    for (let i = 0; i < Math.min(15, allRows.length); i++) {
+        const cols = allRows[i].filter(c => c !== '' && c != null);
+        if (cols.length > maxCols) {
+            maxCols = cols.length;
+            headerIdx = i;
+        }
+    }
+
+    const headers = allRows[headerIdx].map(h => String(h).trim());
+    const rows = allRows.slice(headerIdx + 1).filter(r => r.some(cell => cell !== '' && cell != null));
 
     return { headers, rows };
 }
