@@ -155,6 +155,7 @@ function renderPackingList() {
     // Update Dashboard global stats
     const totalPesananEl = document.getElementById('packingStatPesanan');
     const totalBarangEl = document.getElementById('packingStatBarang');
+    const totalAvgEl = document.getElementById('packingStatAvg');
     if (totalPesananEl) totalPesananEl.innerText = filteredOrders.length.toLocaleString('id-ID');
     // Calculate qty for filtered
     let filteredQty = 0;
@@ -162,6 +163,7 @@ function renderPackingList() {
         o.items.forEach(i => { filteredQty += i.jumlah; });
     });
     if (totalBarangEl) totalBarangEl.innerText = filteredQty.toLocaleString('id-ID');
+      if (totalAvgEl) totalAvgEl.innerText = filteredOrders.length > 0 ? (filteredQty / filteredOrders.length).toFixed(2).replace('.', ',') : '0,00';
 
     let html = '';
     
@@ -323,4 +325,6 @@ function switchOrderTab(tabName) {
     }
     if (typeof renderPackingList === 'function') renderPackingList();
 }
+
+
 
