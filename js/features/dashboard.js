@@ -22,34 +22,6 @@ function renderDashboard(container) {
     
     if (!kurirHtml) kurirHtml = '<div style="text-align:center; color:#94a3b8; font-size:13px; padding:20px 0;">Belum ada data ekspedisi</div>';
 
-    // Calculate Top Products
-    let productCounts = {};
-    if (window.ordersData && window.ordersData.length > 0) {
-        window.ordersData.forEach(o => {
-            if (o.items) {
-                o.items.forEach(item => {
-                    if (!productCounts[item.produk]) productCounts[item.produk] = 0;
-                    productCounts[item.produk] += item.jumlah;
-                });
-            }
-        });
-    }
-    const topProducts = Object.entries(productCounts).sort((a,b) => b[1] - a[1]).slice(0, 5);
-    let topProductsHtml = '';
-    topProducts.forEach((p, i) => {
-        let name = p[0];
-        topProductsHtml += `
-            <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px 0; border-bottom: ${i === topProducts.length-1 ? 'none' : '1px dashed #e2e8f0'};">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <div style="width:28px; height:28px; border-radius:6px; background:var(--brand-light); color:var(--brand-secondary); display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:12px;">${i+1}</div>
-                    <span style="font-weight:600; color:var(--text-primary); font-size:13px; max-width: 130px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${name}">${name}</span>
-                </div>
-                <div style="font-weight:700; color:var(--success); font-size:12px; background:#dcfce7; padding: 4px 8px; border-radius:20px;">${p[1]} pcs</div>
-            </div>
-        `;
-    });
-    if (!topProductsHtml) topProductsHtml = '<div style="text-align:center; color:#94a3b8; font-size:13px; padding:20px 0;">Belum ada data produk</div>';
-
     let tStat = window.ordersStats.perluDikirim + window.ordersStats.dikirim + window.ordersStats.selesai + window.ordersStats.batal;
     let pctP = tStat ? Math.round((window.ordersStats.perluDikirim/tStat)*100) : 0;
     let pctD = tStat ? Math.round((window.ordersStats.dikirim/tStat)*100) : 0;
@@ -76,11 +48,11 @@ function renderDashboard(container) {
                     </div>
                 </div>
 
-                <!-- Top Products -->
+                <!-- Top Products Chart -->
                 <div class="card" style="padding: 20px; display:flex; flex-direction:column; background:white; border-radius:var(--radius-md); border:1px solid var(--border-light);">
                     <h3 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; display:flex; align-items:center; gap:8px;"><i class="ti ti-trophy" style="color:#eab308;"></i> Top 5 Produk Terlaris</h3>
-                    <div style="flex:1; overflow-y:auto; padding-right:4px;">
-                        ${topProductsHtml}
+                    <div style="flex:1; display:flex; flex-direction:column; position:relative; min-height:200px;">
+                        <canvas id="topProductsChart"></canvas>
                     </div>
                 </div>
                 
@@ -97,6 +69,7 @@ function renderDashboard(container) {
     `;
     
     setTimeout(() => {
+        // Doughnut Chart (Status)
         const ctxStatus = document.getElementById('packingStatusChart');
         if (ctxStatus && window.Chart) {
             if (window.packingStatusChartInstance) {
@@ -118,9 +91,7 @@ function renderDashboard(container) {
                     maintainAspectRatio: true,
                     cutout: '70%',
                     plugins: {
-                        legend: {
-                            display: false
-                        },
+                        legend: { display: false },
                         tooltip: {
                             backgroundColor: 'rgba(15, 23, 42, 0.9)',
                             titleFont: { family: "'Inter', sans-serif" },
@@ -137,6 +108,85 @@ function renderDashboard(container) {
                 }
             });
         }
+
+        // Horizontal Bar Chart (Top Products)
+        const ctxProducts = document.getElementById('topProductsChart');
+        if (ctxProducts && window.Chart) {
+            if (window.topProductsChartInstance) {
+                window.topProductsChartInstance.destroy();
+            }
+
+            // Calculate Top Products dynamically
+            let productCounts = {};
+            if (window.ordersData && window.ordersData.length > 0) {
+                window.ordersData.forEach(o => {
+                    if (o.items) {
+                        o.items.forEach(item => {
+                            if (!productCounts[item.produk]) productCounts[item.produk] = 0;
+                            productCounts[item.produk] += item.jumlah;
+                        });
+                    }
+                });
+            }
+            const topProducts = Object.entries(productCounts).sort((a,b) => b[1] - a[1]).slice(0, 5);
+            
+            // Labels and Data
+            const labels = topProducts.map(p => p[0].length > 18 ? p[0].substring(0, 18) + '...' : p[0]);
+            const data = topProducts.map(p => p[1]);
+
+            if (topProducts.length === 0) {
+                ctxProducts.parentElement.innerHTML = '<div style="text-align:center; padding: 40px; color: var(--text-tertiary); font-size:13px;">Belum ada data produk</div>';
+            } else {
+                window.topProductsChartInstance = new Chart(ctxProducts, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: '#2563EB',
+                            borderRadius: 4,
+                            barThickness: 16
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y', // Makes it horizontal
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                titleFont: { family: "'Inter', sans-serif" },
+                                bodyFont: { family: "'Inter', sans-serif" },
+                                padding: 12,
+                                cornerRadius: 8,
+                                callbacks: {
+                                    title: function(context) {
+                                        return topProducts[context[0].dataIndex][0]; // Full name on tooltip
+                                    },
+                                    label: function(context) {
+                                        return ' ' + context.parsed.x + ' terjual';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                display: false, // Hide X axis
+                                grid: { display: false }
+                            },
+                            y: {
+                                grid: { display: false, drawBorder: false },
+                                ticks: {
+                                    font: { family: "'Inter', sans-serif", size: 11, weight: '600' },
+                                    color: '#475569'
+                                },
+                                border: { display: false }
+                            }
+                        }
+                    }
+                });
+            }
+        }
     }, 100);
 }
-
