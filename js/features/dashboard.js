@@ -28,8 +28,8 @@ function renderDashboard(container) {
         window.ordersData.forEach(o => {
             if (o.items) {
                 o.items.forEach(item => {
-                    if (!productCounts[item.namaProduk]) productCounts[item.namaProduk] = 0;
-                    productCounts[item.namaProduk] += item.jumlah;
+                    if (!productCounts[item.produk]) productCounts[item.produk] = 0;
+                    productCounts[item.produk] += item.jumlah;
                 });
             }
         });
@@ -64,7 +64,7 @@ function renderDashboard(container) {
                 <div class="card" style="padding: 20px; display:flex; flex-direction:column; background:white; border-radius:var(--radius-md); border:1px solid var(--border-light);">
                     <h3 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; display:flex; align-items:center; gap:8px;"><i class="ti ti-chart-pie" style="color:var(--brand-primary);"></i> Komposisi Status</h3>
                     
-                    <div style="flex: 1; position: relative; min-height: 180px;">
+                    <div style="display:flex; justify-content:center; align-items:center; flex:1; min-height:180px; max-height:220px;">
                         <canvas id="packingStatusChart"></canvas>
                     </div>
                     
@@ -115,7 +115,7 @@ function renderDashboard(container) {
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
+                    maintainAspectRatio: true,
                     cutout: '70%',
                     plugins: {
                         legend: {
@@ -139,3 +139,4 @@ function renderDashboard(container) {
         }
     }, 100);
 }
+
