@@ -40,7 +40,7 @@ function renderDashboard(container) {
                         <div style="width: 220px; height: 220px; position: relative; flex-shrink: 0;">
                             <canvas id="packingStatusChart"></canvas>
                         </div>
-                        <div style="flex: 1; display: flex; flex-direction: column; gap: 18px;">
+                        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 18px;">
                             <div style="display:flex; align-items:center; gap:12px; font-size:15px; color:var(--text-primary); font-weight:700;">
                                 <div style="width:24px; height:24px; border-radius:6px; background:#f97316;"></div>
                                 Perlu Dikirim (${pctP}%)
@@ -93,21 +93,21 @@ function renderDashboard(container) {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    cutoutPercentage: 65,
-                    legend: {
-                        display: false // We use our custom HTML legend!
-                    },
-                    tooltips: {
-                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                        titleFontFamily: "'Inter', sans-serif",
-                        bodyFontFamily: "'Inter', sans-serif",
-                        padding: 12,
-                        cornerRadius: 8,
-                        callbacks: {
-                            label: function(tooltipItem, data) {
-                                var dataset = data.datasets[tooltipItem.datasetIndex];
-                                var currentValue = dataset.data[tooltipItem.index];
-                                return ' ' + currentValue + ' pesanan';
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            titleFont: { family: "'Inter', sans-serif" },
+                            bodyFont: { family: "'Inter', sans-serif" },
+                            padding: 12,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    return ' ' + context.parsed + ' pesanan';
+                                }
                             }
                         }
                     }
@@ -122,6 +122,9 @@ function renderDashboard(container) {
     if (statPesanan) statPesanan.innerText = window.ordersStats.total.toLocaleString('id-ID');
     if (statBarang) statBarang.innerText = window.ordersStats.qty.toLocaleString('id-ID');
 }
+
+
+
 
 
 
