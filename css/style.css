@@ -12,19 +12,19 @@
             --bg-overlay: rgba(15, 23, 42, 0.5);
 
             /* Brand Colors */
-            --brand-primary: #0F766E;
-            --brand-secondary: #14B8A6;
-            --brand-accent: #5EEAD4;
-            --brand-light: #CCFBF1;
-            --brand-dark: #042F2E;
-            --brand-gradient: linear-gradient(135deg, #0F766E 0%, #14B8A6 50%, #2DD4BF 100%);
+            --brand-primary: #1E3A8A;
+            --brand-secondary: #2563EB;
+            --brand-accent: #60A5FA;
+            --brand-light: #DBEAFE;
+            --brand-dark: #0F172A;
+            --brand-gradient: linear-gradient(135deg, #0F172A 0%, #1E3A8A 50%, #3B82F6 100%);
 
             /* Text Colors */
             --text-primary: #0F172A;
             --text-secondary: #475569;
             --text-tertiary: #94A3B8;
             --text-inverse: #FFFFFF;
-            --text-brand: #0F766E;
+            --text-brand: #2563EB;
 
             /* Semantic Colors */
             --success: #16A34A;
@@ -1565,4 +1565,5 @@ tr:hover {
     background-color: #f8fafc !important;
     transform: scale(1.002);
 }
+
 
